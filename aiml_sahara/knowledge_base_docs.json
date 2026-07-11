@@ -1,0 +1,114 @@
+[
+  {
+    "id": "heart_attack",
+    "category": "Medical",
+    "condition": "Heart Attack",
+    "source": "General first-aid guidelines (NHS / St John Ambulance / Red Cross)",
+    "content": "Heart Attack: Signs include chest pain or pressure, pain spreading to the arm/jaw/back, shortness of breath, nausea, and cold sweat. First aid: Call emergency services immediately. Help the person sit down in a comfortable, supported position and stay calm. Loosen any tight clothing around the neck and chest. If the person is conscious, not allergic to aspirin, and local guidance allows it, giving one aspirin to chew can help. Monitor breathing and responsiveness continuously and be ready to begin CPR if they become unresponsive and stop breathing normally."
+  },
+  {
+    "id": "stroke",
+    "category": "Medical",
+    "condition": "Stroke",
+    "source": "General first-aid guidelines (NHS / St John Ambulance)",
+    "content": "Stroke: Use the F.A.S.T. test. FACE - has one side dropped, can they smile evenly? ARMS - can they raise both arms and hold them there? SPEECH - is it slurred, or are they unable to speak or understand? TIME - if any sign is present, time is critical; call emergency services immediately. Note the exact time symptoms started, since this affects treatment options. Keep the person calm, do not give them food or drink, and monitor their breathing and consciousness until help arrives."
+  },
+  {
+    "id": "asthma",
+    "category": "Medical",
+    "condition": "Bronchial Asthma / Breathing Difficulty",
+    "source": "General first-aid guidelines (St John Ambulance)",
+    "content": "Asthma attack or breathing difficulty: Help the person sit upright in a comfortable position, leaning slightly forward. Encourage them to use their reliever inhaler (usually blue) if they have one, taking slow steady puffs. Stay calm and reassure them, as anxiety can worsen breathing. If there is no improvement within a few minutes, if they have no inhaler, or if their lips or face turn blue, call emergency services immediately."
+  },
+  {
+    "id": "choking",
+    "category": "Medical",
+    "condition": "Choking",
+    "source": "General first-aid guidelines (NHS / St John Ambulance)",
+    "content": "Choking: If the person can cough, encourage them to keep coughing to try to clear the blockage. If they cannot cough, speak, or breathe, give up to 5 sharp back blows between the shoulder blades with the heel of your hand, leaning them forward first. If that does not work, give up to 5 abdominal thrusts: stand behind them, place a fist just above the belly button, grasp it with your other hand, and pull sharply inward and upward. Alternate 5 back blows and 5 abdominal thrusts. Call emergency services immediately if the blockage does not clear."
+  },
+  {
+    "id": "bleeding",
+    "category": "Medical",
+    "condition": "Severe Bleeding",
+    "source": "General first-aid guidelines (Red Cross)",
+    "content": "Severe bleeding: Apply firm, direct pressure to the wound using a clean cloth or dressing and keep pressing continuously. Raise the injured area above the level of the heart if possible without moving the person unnecessarily. Do not remove any object stuck in the wound; pack around it instead. If bleeding soaks through the dressing, add more layers on top rather than removing the original one. Call emergency services immediately for heavy or uncontrolled bleeding, and watch for signs of shock such as pale skin, rapid breathing, or dizziness."
+  },
+  {
+    "id": "burns",
+    "category": "Medical",
+    "condition": "Burns",
+    "source": "General first-aid guidelines (NHS)",
+    "content": "Burns: Cool the burn under cool (not ice-cold) running water for at least 20 minutes. Remove any clothing or jewellery near the burn unless it is stuck to the skin. Cover the burn loosely with cling film or a clean, non-fluffy cloth. Do not apply creams, butter, or ice directly to the burn. Seek emergency medical help for burns larger than the person's palm, burns on the face/hands/genitals, or burns that look white, charred, or leathery."
+  },
+  {
+    "id": "fainting",
+    "category": "Medical",
+    "condition": "Fainting / Unconsciousness",
+    "source": "General first-aid guidelines (Red Cross)",
+    "content": "Fainting or unresponsiveness: Check if the person responds to voice or touch. If they are breathing normally but unresponsive, place them in the recovery position on their side to keep the airway clear. If they are not breathing normally, begin CPR and call emergency services immediately. For simple fainting where the person is regaining consciousness, help them lie down with legs slightly raised, loosen tight clothing, and ensure fresh air; do not give food or water until they are fully alert."
+  },
+  {
+    "id": "seizure",
+    "category": "Medical",
+    "condition": "Seizure",
+    "source": "General first-aid guidelines (Epilepsy Foundation / NHS)",
+    "content": "Seizure: Stay calm and time the seizure. Clear the area of hard or sharp objects and cushion the person's head. Do not hold them down or put anything in their mouth. Once the jerking stops, place them in the recovery position and stay with them until they are fully alert. Call emergency services if the seizure lasts longer than 5 minutes, if another seizure follows immediately, if the person is injured, pregnant, or if this is their first known seizure."
+  },
+  {
+    "id": "allergic_reaction",
+    "category": "Medical",
+    "condition": "Severe Allergic Reaction / Anaphylaxis",
+    "source": "General first-aid guidelines (NHS)",
+    "content": "Severe allergic reaction (anaphylaxis): Look for swelling of the face/throat, difficulty breathing, hives, or a sudden feeling of faintness. Call emergency services immediately. If the person has an auto-injector (such as an EpiPen), help them use it in the outer thigh as directed. Help them into a comfortable position - lying down with legs raised if they feel faint, or sitting up if breathing is difficult. Be prepared to give a second dose of the auto-injector after 5-15 minutes if there is no improvement and help has not arrived."
+  },
+  {
+    "id": "drowning",
+    "category": "Medical",
+    "condition": "Drowning",
+    "source": "General first-aid guidelines (Red Cross)",
+    "content": "Drowning: Only enter water to help if you are trained and it is safe to do so; otherwise use a rope, pole, or floating object to help the person reach safety. Once out of the water, check breathing. If not breathing normally, begin CPR immediately and call emergency services. Keep the person warm with dry clothing or a blanket, as hypothermia is a serious risk even after rescue. Anyone who has nearly drowned should be assessed by a medical professional even if they seem fine, due to the risk of delayed complications."
+  },
+  {
+    "id": "panic_attack",
+    "category": "Emotional/Mental Support",
+    "condition": "Panic Attack / Acute Anxiety",
+    "source": "General mental health first-aid guidelines (Mental Health First Aid / NHS)",
+    "content": "Panic attack or acute anxiety crisis: Speak calmly and reassure the person that they are safe and that this will pass. Encourage slow breathing - inhaling for 4 seconds, holding for 4, exhaling for 6 - and offer to breathe together with them. Move to a quieter, less crowded space if possible. Avoid dismissive language; validate that what they are feeling is real and distressing. Stay with them until the acute symptoms ease. Seek medical help if chest pain, fainting, or symptoms lasting well beyond the usual 20-30 minutes occur, since these can sometimes overlap with medical emergencies."
+  },
+  {
+    "id": "suicidal_crisis",
+    "category": "Emotional/Mental Support",
+    "condition": "Suicidal Ideation / Mental Health Crisis",
+    "source": "General mental health first-aid guidelines",
+    "content": "If someone expresses thoughts of suicide or self-harm: Take it seriously and stay calm. Do not leave the person alone. Ask directly and gently whether they are thinking of harming themselves - this does not increase risk and can open a path to help. Remove access to any obvious means of harm if safely possible. Encourage and help them contact a crisis helpline or emergency services, or take them to the nearest emergency room. This situation needs immediate professional support; a first-aid responder's role is to keep the person safe and connected to help, not to manage the crisis alone."
+  },
+  {
+    "id": "harassment_support",
+    "category": "Support for Women or LGBTQ+",
+    "condition": "Harassment or Assault - Immediate Support",
+    "source": "General safety-response guidance",
+    "content": "If someone reports being harassed, followed, or assaulted: Prioritize their immediate physical safety - help them move to a well-lit, populated, or secure location such as a shop, security desk, or with a trusted contact. Avoid pressuring them to make decisions immediately (like confronting the person involved or filing a report) unless they are in immediate danger, in which case call emergency services or campus security right away. Believe them and avoid questioning their account in the moment. Offer to stay with them, help them contact someone they trust, or connect them with local support services or campus/women's safety helplines."
+  },
+  {
+    "id": "safety_escort",
+    "category": "Safety/Escort",
+    "condition": "Feeling Unsafe / Needs Escort",
+    "source": "General safety-response guidance",
+    "content": "If someone reports feeling unsafe while walking or traveling alone: Advise them to move toward a public, well-lit area with other people if possible, such as a shop, cafe, or security post. Encourage them to stay on the phone or in message contact with a trusted person or a nearby volunteer until they are safe. If they report being actively followed or threatened, this should be treated as urgent - encourage them to contact local emergency services or campus/community security immediately rather than waiting for a volunteer to arrive."
+  },
+  {
+    "id": "lost_stranded",
+    "category": "Lost or Stranded",
+    "condition": "Lost or Stranded",
+    "source": "General safety-response guidance",
+    "content": "If someone reports being lost or stranded: Help them share their live location if possible. Advise them to stay in a visible, safe, populated area rather than wandering further, especially at night. If they are stranded due to a vehicle or transport issue, advise them to stay with the vehicle if it is safe to do so, as it is easier for help to locate. Encourage them to conserve phone battery by reducing screen brightness and closing unused apps while waiting for help."
+  },
+  {
+    "id": "default",
+    "category": "General",
+    "condition": "Default / Unclassified Emergency",
+    "source": "General first-aid principles (Red Cross)",
+    "content": "General emergency response when the situation is unclear: CHECK the scene and the person for immediate danger. CALL emergency services if the person is unresponsive, struggling to breathe, bleeding heavily, or otherwise in a life-threatening situation. CARE for the person within your level of training - keep them calm, comfortable, and safe until help arrives or a qualified volunteer responds. When in doubt about severity, treat the situation as urgent rather than waiting to see if it worsens."
+  }
+]

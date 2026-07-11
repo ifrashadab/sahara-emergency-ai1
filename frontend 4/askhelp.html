@@ -63,6 +63,16 @@
       <label for="description">Describe Your Situation</label>
       <textarea id="description" placeholder="Briefly describe what you’re facing..." required></textarea>
 
+      <button type="button" class="btn" id="btnAiGuidance" style="margin-top:10px;">🤖 Get Instant Guidance</button>
+
+      <!-- AI guidance panel: shows retrieval-grounded steps while the human help request is (separately) sent -->
+      <div id="aiPanel" style="display:none; margin-top:14px; padding:14px; border-radius:8px; border:1px solid #cce5ff; background:#f4faff;">
+        <div id="aiSeverityBadge" style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; margin-bottom:8px;"></div>
+        <div id="aiAnswer" style="white-space:pre-wrap; font-size:0.95em; line-height:1.5;"></div>
+        <div id="aiSources" style="margin-top:8px; font-size:0.78em; color:#557;"></div>
+        <div style="margin-top:8px; font-size:0.78em; color:#a55;">This is AI-generated guidance grounded in general first-aid sources — not a substitute for emergency services or professional care.</div>
+      </div>
+
       <div class="note small" id="status">Not connected to Firebase yet.</div>
 
       <button type="submit" id="submitBtn">Send Help Request</button>
@@ -141,6 +151,72 @@
       const { lat, lon } = currentCoords;
       document.getElementById('mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01},${lat-0.01},${lon+0.01},${lat+0.01}&layer=mapnik&marker=${lat},${lon}`;
       document.getElementById('mapContainer').style.display = 'block';
+    });
+
+    // --- AI guidance (RAG-powered) ---
+    // Point this at your deployed backend, e.g. https://your-app.onrender.com
+    const TRIAGE_API_URL = 'http://localhost:8000/triage';
+
+    const severityColors = {
+      low:      { bg: '#e6f4ea', fg: '#1a7f37' },
+      medium:   { bg: '#fff8e1', fg: '#b8860b' },
+      high:     { bg: '#ffe9e0', fg: '#c0392b' },
+      critical: { bg: '#ffdcdc', fg: '#a80000' }
+    };
+
+    document.getElementById('btnAiGuidance').addEventListener('click', async () => {
+      const description = document.getElementById('description').value.trim();
+      const type = document.getElementById('type').value;
+      const aiBtn = document.getElementById('btnAiGuidance');
+      const panel = document.getElementById('aiPanel');
+
+      if (!description) {
+        alert('Please describe your situation first.');
+        return;
+      }
+
+      aiBtn.disabled = true;
+      aiBtn.textContent = 'Thinking...';
+      panel.style.display = 'none';
+
+      try {
+        const res = await fetch(TRIAGE_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: description, help_type: type || null })
+        });
+
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
+        const data = await res.json();
+
+        const sev = (data.severity || 'low').toLowerCase();
+        const colors = severityColors[sev] || severityColors.low;
+        const badge = document.getElementById('aiSeverityBadge');
+        badge.textContent = data.escalate
+          ? `⚠ ${sev.toUpperCase()} — flagged for urgent attention`
+          : `Severity: ${sev}`;
+        badge.style.background = colors.bg;
+        badge.style.color = colors.fg;
+
+        document.getElementById('aiAnswer').textContent = data.answer;
+
+        const sourcesEl = document.getElementById('aiSources');
+        if (data.retrieved_sources && data.retrieved_sources.length) {
+          sourcesEl.textContent = 'Based on: ' + data.retrieved_sources
+            .map(s => `${s.condition} (${s.source})`)
+            .join(' · ');
+        } else {
+          sourcesEl.textContent = '';
+        }
+
+        panel.style.display = 'block';
+      } catch (err) {
+        console.error('Triage request failed:', err);
+        alert('Could not reach the AI guidance service. Your help request can still be sent below.');
+      } finally {
+        aiBtn.disabled = false;
+        aiBtn.textContent = '🤖 Get Instant Guidance';
+      }
     });
 
     // Submit form
