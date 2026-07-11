@@ -1,23 +1,13 @@
-# main.py
-"""
-SAHARA AI Triage Service — RAG + LLM edition.
-
-Replaces the old classifier -> static-dictionary-lookup flow with:
-  1. Retrieval: embed the user's message, pull the most relevant first-aid /
-     safety guidance chunks from a Chroma vector store.
-  2. Generation: send the user's message + retrieved context to an LLM
-     (Claude), which reasons over the retrieved guidance instead of just
-     regurgitating a fixed template.
-  3. Agentic escalation: the LLM has one tool, `flag_for_escalation`, which
-     it calls when it judges the situation to be medium/high/critical
-     severity. This is what turns the service from "answer a question" into
-     "make a judgment call and act on it."
-
-Run:
-    uvicorn main:app --reload --port 8000
-
-Requires ANTHROPIC_API_KEY to be set (see .env.example).
-"""
+# main.py — SAHARA AI Triage Service (RAG + LLM, Groq free-tier edition)
+#
+# Same architecture as before, but the LLM is now Llama 3.3 70B served by
+# Groq's free API instead of Anthropic Claude. The /triage response format is
+# unchanged, so the frontend (assistant.html / askhelp.html) needs no edits.
+#
+# Run:
+#   pip3 install groq --user           (one extra dependency)
+#   put GROQ_API_KEY=gsk_... in .env
+#   python3 -m uvicorn main:app --reload --port 8000
 
 import os
 import json
@@ -30,26 +20,26 @@ from dotenv import load_dotenv
 
 import chromadb
 from chromadb.utils import embedding_functions
-import anthropic
+from groq import Groq
 
 load_dotenv()
 
 CHROMA_DIR = "./chroma_db"
 COLLECTION_NAME = "sahara_first_aid_kb"
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
-CLAUDE_MODEL = "claude-sonnet-4-6"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 TOP_K = 3
 
-app = FastAPI(title="SAHARA AI Triage — RAG Edition")
+app = FastAPI(title="SAHARA AI Triage — RAG (Groq)")
 
-# CORS: allow the SAHARA frontend (served from anywhere during dev / your
-# deployed domain in prod) to call this API directly from the browser.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # tighten to your deployed frontend origin in production
     allow_methods=["*"],
     allow_headers=["*"],
 )
+from karma_api import router as karma_router
+app.include_router(karma_router)
 
 print("Connecting to vector store...")
 chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
@@ -61,41 +51,40 @@ collection = chroma_client.get_collection(
 )
 print("Vector store ready.")
 
-llm_client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
+llm_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 
 class TriageRequest(BaseModel):
     text: str
-    help_type: Optional[str] = None  # e.g. "Medical", "Safety/Escort" — from the dropdown in askhelp.html
+    help_type: Optional[str] = None
 
 
-class EscalationFlag(BaseModel):
-    severity: str
-    reason: str
-
-
-# --- Tool definition: the one action the model is allowed to take ---------
+# --- Tool definition (OpenAI/Groq function-calling format) -----------------
 ESCALATION_TOOL = {
-    "name": "flag_for_escalation",
-    "description": (
-        "Call this when the situation described is medium, high, or critical "
-        "severity and should be flagged for urgent human/volunteer attention "
-        "rather than just receiving informational guidance."
-    ),
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "severity": {
-                "type": "string",
-                "enum": ["medium", "high", "critical"],
-                "description": "How urgent this situation is.",
+    "type": "function",
+    "function": {
+        "name": "flag_for_escalation",
+        "description": (
+            "Call this when the situation described is medium, high, or "
+            "critical severity and should be flagged for urgent "
+            "human/volunteer attention rather than just receiving "
+            "informational guidance."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "severity": {
+                    "type": "string",
+                    "enum": ["medium", "high", "critical"],
+                    "description": "How urgent this situation is.",
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "One sentence explaining why this severity was chosen.",
+                },
             },
-            "reason": {
-                "type": "string",
-                "description": "One sentence explaining why this severity was chosen.",
-            },
+            "required": ["severity", "reason"],
         },
-        "required": ["severity", "reason"],
     },
 }
 
@@ -134,8 +123,8 @@ Instructions:
   scared or in a hurry.
 - Always state plainly if the person should contact emergency services.
 - If the situation is medium, high, or critical severity, call the
-  flag_for_escalation tool with your severity judgment before or alongside
-  your written answer.
+  flag_for_escalation tool with your severity judgment. Also always write
+  your guidance text — never respond with only a tool call.
 - You are not a substitute for professional medical, mental health, or law
   enforcement response — say so briefly when relevant, without being so
   verbose it buries the actionable steps.
@@ -151,31 +140,60 @@ def triage(request: TriageRequest):
     if request.help_type:
         user_message = f"[Reported help type: {request.help_type}]\n{user_message}"
 
-    response = llm_client.messages.create(
-        model=CLAUDE_MODEL,
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_message},
+    ]
+
+    response = llm_client.chat.completions.create(
+        model=GROQ_MODEL,
         max_tokens=800,
-        system=system_prompt,
+        messages=messages,
         tools=[ESCALATION_TOOL],
-        messages=[{"role": "user", "content": user_message}],
+        tool_choice="auto",
     )
 
-    escalation: Optional[EscalationFlag] = None
-    answer_text = ""
+    choice = response.choices[0].message
+    answer_text = choice.content or ""
+    escalation = None
 
-    for block in response.content:
-        if block.type == "text":
-            answer_text += block.text
-        elif block.type == "tool_use" and block.name == "flag_for_escalation":
-            escalation = EscalationFlag(
-                severity=block.input.get("severity", "medium"),
-                reason=block.input.get("reason", ""),
-            )
+    if choice.tool_calls:
+        for tc in choice.tool_calls:
+            if tc.function.name == "flag_for_escalation":
+                try:
+                    args = json.loads(tc.function.arguments)
+                except (json.JSONDecodeError, TypeError):
+                    args = {}
+                escalation = {
+                    "severity": args.get("severity", "medium"),
+                    "reason": args.get("reason", ""),
+                }
+
+    # Some models return ONLY a tool call with empty text. If so, make a
+    # second call without tools to get the written guidance.
+    if not answer_text.strip():
+        followup = llm_client.chat.completions.create(
+            model=GROQ_MODEL,
+            max_tokens=800,
+            messages=messages
+            + [
+                {
+                    "role": "assistant",
+                    "content": "(Severity has been assessed. Now writing the guidance.)",
+                },
+                {
+                    "role": "user",
+                    "content": "Now write the step-by-step guidance for the situation above.",
+                },
+            ],
+        )
+        answer_text = followup.choices[0].message.content or ""
 
     return {
         "answer": answer_text.strip(),
         "escalate": escalation is not None,
-        "severity": escalation.severity if escalation else "low",
-        "escalation_reason": escalation.reason if escalation else None,
+        "severity": escalation["severity"] if escalation else "low",
+        "escalation_reason": escalation["reason"] if escalation else None,
         "retrieved_sources": [
             {"condition": c["condition"], "source": c["source"]}
             for c in context_chunks

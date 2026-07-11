@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAHARA — Rewards</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  :root{--plum:#1A0E1E;--surface:#26142E;--surface-2:#331B3D;--line:#43254F;--violet:#8B5CF6;--pink:#F472B6;
+    --text:#F5EFF9;--text-soft:#B69FC4;--grad:linear-gradient(135deg,var(--violet),var(--pink))}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--plum);color:var(--text);min-height:100dvh;
+    background-image:radial-gradient(600px 400px at 90% 0%,rgba(139,92,246,.2),transparent 70%),radial-gradient(500px 400px at 0% 80%,rgba(244,114,182,.12),transparent 70%);
+    background-attachment:fixed;display:flex;flex-direction:column;align-items:center;padding:0 18px 60px}
+  .px{font-family:'Geist Pixel','Press Start 2P',monospace;letter-spacing:.02em;line-height:1.45}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+  .top{width:100%;max-width:720px;display:flex;align-items:center;padding:20px 0;gap:12px}
+  .top a{color:var(--text-soft);font-size:.85rem;font-weight:600}.top a:hover{color:var(--text)}
+  .spacer{flex:1}
+  .wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:18px}
+
+  .hero-card{background:var(--grad);border-radius:24px;padding:30px;color:#fff;text-align:center}
+  .hero-card .px{font-size:clamp(1.2rem,4vw,2rem)}
+  .hero-card small{opacity:.9;font-size:.8rem}
+  .level-bar{margin-top:16px;height:8px;border-radius:8px;background:rgba(255,255,255,.25);overflow:hidden}
+  .level-bar i{display:block;height:100%;background:#fff;border-radius:8px;transition:width .6s ease}
+  .level-row{display:flex;justify-content:space-between;font-size:.7rem;margin-top:8px;opacity:.9}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px}
+  .card h2{font-size:.85rem;margin-bottom:16px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .voucher{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:var(--surface-2)}
+  .voucher .b{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:.75rem;color:#1A0E1E;flex-shrink:0}
+  .voucher b{font-size:.9rem;display:block}
+  .voucher small{color:var(--text-soft);font-size:.74rem}
+  .voucher button{margin-left:auto;padding:9px 18px;border-radius:999px;background:var(--grad);color:#fff;font-weight:700;font-size:.76rem}
+  .voucher button:disabled{opacity:.4;cursor:default}
+
+  .lb-row{display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid var(--line);font-size:.88rem}
+  .lb-row:last-child{border-bottom:none}
+  .lb-row .rank{width:28px;font-weight:800;color:var(--text-soft)}
+  .lb-row .rank.top{color:var(--pink)}
+  .lb-row .pts{margin-left:auto;font-weight:700;font-size:.8rem}
+  .lb-row.me{background:rgba(139,92,246,.12);border-radius:12px;border-bottom:none}
+
+  .earn{font-size:.82rem;color:var(--text-soft);line-height:2}
+  .earn b{color:var(--text)}
+  .toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--line);padding:13px 26px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:80;transition:transform .35s}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a href="volunteer.html">← Volunteer feed</a>
+  <div class="spacer"></div>
+  <a href="profile.html">Profile →</a>
+</div>
+
+<div class="wrap">
+  <div class="hero-card">
+    <small>YOUR KARMA</small>
+    <div class="px" id="karmaBig">0 PTS</div>
+    <div class="level-bar"><i id="levelFill" style="width:0%"></i></div>
+    <div class="level-row"><span id="levelName">Helper</span><span id="levelNext"></span></div>
+  </div>
+
+  <div class="card">
+    <h2 class="px">REDEEM VOUCHERS</h2>
+    <div class="voucher"><div class="b" style="background:#F8CB46">Bk</div><div><b>Blinkit ₹75</b><small>1,000 pts</small></div><button data-cost="1000" data-brand="Blinkit ₹75">Redeem</button></div>
+    <div class="voucher"><div class="b" style="background:#FF9900">Am</div><div><b>Amazon ₹100 gift card</b><small>2,000 pts</small></div><button data-cost="2000" data-brand="Amazon ₹100">Redeem</button></div>
+    <div class="voucher"><div class="b" style="background:#2874F0;color:#fff">Fk</div><div><b>Flipkart ₹150 gift card</b><small>3,000 pts</small></div><button data-cost="3000" data-brand="Flipkart ₹150">Redeem</button></div>
+    <small style="color:var(--text-soft);font-size:.72rem">Redemptions are reviewed and delivered to your registered email within 48h.</small>
+  </div>
+
+  <div class="card">
+    <h2 class="px">LEADERBOARD</h2>
+    <div id="lb">Loading…</div>
+  </div>
+
+  <div class="card">
+    <h2 class="px">HOW TO EARN</h2>
+    <div class="earn">
+      <b>+100</b> — accept an open case &nbsp;·&nbsp; <b>+250</b> — resolve a case<br>
+      <b>+150 bonus</b> — resolve a critical-severity case<br>
+      <b>+50</b> — complete your volunteer profile &nbsp;·&nbsp; <b>+50/week</b> — availability streak
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAfhLcpJ19GFJfZ2gQMUI2QsNkkIRE9QkA",
+  authDomain: "sahara-ai-4e3ee.firebaseapp.com",
+  projectId: "sahara-ai-4e3ee",
+  storageBucket: "sahara-ai-4e3ee.firebasestorage.app",
+  messagingSenderId: "605933418886",
+  appId: "1:605933418886:web:111541a8b9fcb3945dd407"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.firestore();
+const $ = id => document.getElementById(id);
+
+const LEVELS = [
+  { name: 'Helper', min: 0 }, { name: 'Guardian', min: 500 },
+  { name: 'Sentinel', min: 2000 }, { name: 'Lighthouse', min: 5000 }
+];
+
+let me = null, spendable = 0;
+
+auth.onAuthStateChanged(user => {
+  if (!user) { location.href = 'login.html'; return; }
+  me = user;
+
+  db.collection('users').doc(me.uid).onSnapshot(s => {
+    const d = s.data() || {}, k = d.karma || {};
+    const life = k.lifetime || 0; spendable = k.spendable || 0;
+    $('karmaBig').textContent = life.toLocaleString() + ' PTS';
+
+    let lvl = LEVELS[0], next = LEVELS[1];
+    for (let i = LEVELS.length - 1; i >= 0; i--) if (life >= LEVELS[i].min) { lvl = LEVELS[i]; next = LEVELS[i+1]; break; }
+    $('levelName').textContent = lvl.name;
+    if (next) {
+      $('levelNext').textContent = `${(next.min - life).toLocaleString()} to ${next.name}`;
+      $('levelFill').style.width = Math.min(100, ((life - lvl.min) / (next.min - lvl.min)) * 100) + '%';
+    } else { $('levelNext').textContent = 'Max level'; $('levelFill').style.width = '100%'; }
+
+    document.querySelectorAll('.voucher button').forEach(b => b.disabled = spendable < +b.dataset.cost);
+  });
+
+  loadLeaderboard();
+});
+
+async function loadLeaderboard() {
+  try {
+    const qs = await db.collection('users').orderBy('karma.lifetime', 'desc').limit(10).get();
+    const rows = qs.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(u => !(u.volunteer && u.volunteer.onLeaderboard === false));
+    $('lb').innerHTML = rows.map((u, i) => `
+      <div class="lb-row ${u.id === me.uid ? 'me' : ''}">
+        <span class="rank ${i < 3 ? 'top' : ''}">#${i + 1}</span>
+        <span>${esc(u.displayName || 'Anonymous')}${u.id === me.uid ? ' (you)' : ''}</span>
+        <span class="pts">${(((u.karma||{}).lifetime)||0).toLocaleString()} ★</span>
+      </div>`).join('') || 'No volunteers yet — be the first.';
+  } catch (e) {
+    console.error(e);
+    $('lb').textContent = 'Leaderboard needs a Firestore index — open the console link in DevTools to create it, then reload.';
+  }
+}
+
+document.querySelectorAll('.voucher button').forEach(b => b.onclick = async () => {
+  const cost = +b.dataset.cost;
+  if (spendable < cost) return;
+  if (!confirm(`Redeem ${b.dataset.brand} for ${cost.toLocaleString()} points?`)) return;
+  try {
+    await db.runTransaction(async t => {
+      const ref = db.collection('users').doc(me.uid);
+      const s = await t.get(ref);
+      const k = (s.data().karma || {});
+      if ((k.spendable || 0) < cost) throw new Error('insufficient');
+      t.update(ref, { 'karma.spendable': (k.spendable || 0) - cost });
+      t.set(db.collection('redemptions').doc(), {
+        uid: me.uid, email: me.email, brand: b.dataset.brand, cost,
+        status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    toast('Redemption requested — check your email within 48h ★');
+  } catch { toast('Could not redeem — insufficient points.'); }
+});
+
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let tT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>

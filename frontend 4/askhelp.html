@@ -1,57 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ask for Help - SAHARA (Offline-friendly)</title>
-  <style>
-    body { margin:0; font-family:'Segoe UI',sans-serif; background:#f0faff; color:#003366; }
-    .container{ max-width:600px; margin:60px auto; padding:30px; background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.05); box-sizing:border-box;}
-    h2{ text-align:center; color:#007acc; margin-bottom:8px; }
-    p.tagline{ text-align:center; color:#005b99; margin-bottom:22px; font-size:1em;}
-    label{ display:block; margin:12px 0 6px; font-weight:500; }
-    input, select, textarea{ width:100%; padding:10px; font-size:1em; border:1px solid #cce5ff; border-radius:6px; background:#f9fdff; box-sizing:border-box; }
-    textarea{ min-height:90px; resize:vertical; }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    .btn{ padding:8px 12px; border:none; border-radius:5px; font-size:0.95em; cursor:pointer; }
-    .location-btn{ background:#cce5ff; color:#005b99; }
-    .location-btn:hover{ background:#b3daff; }
-    .map-btn{ background:#ffe0b3; color:#b35a00; }
-    .map-btn:hover{ background:#ffd699; }
-    button[type="submit"]{ margin-top:20px; width:100%; padding:12px; background:#007acc; color:#fff; border:none; border-radius:6px; font-size:1.05em; cursor:pointer; }
-    button[type="submit"]:hover{ background:#005f99; }
-    .note{ font-size:0.9em; color:#005b99; margin-top:8px; }
-    footer{ text-align:center; padding:18px; background:#eaf6ff; color:#003366; font-size:0.9em; margin-top:32px; }
-    .small{ font-size:0.85em; color:#366; }
-    .map-container{ display:none; margin-top:15px; }
-    .map-container iframe{ width:100%; height:250px; border:0; border-radius:8px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SAHARA — Get Help</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  :root{
+    --plum:#1A0E1E; --surface:#26142E; --surface-2:#331B3D; --line:#43254F;
+    --violet:#8B5CF6; --pink:#F472B6; --red:#EF4444;
+    --text:#F5EFF9; --text-soft:#B69FC4;
+    --grad:linear-gradient(135deg,var(--violet),var(--pink));
+    --sev-low:#34D399; --sev-low-bg:#0E2A1F;
+    --sev-med:#FBBF24; --sev-med-bg:#2C230C;
+    --sev-high:#FB7185; --sev-high-bg:#2E1218;
+    --sev-crit:#EF4444; --sev-crit-bg:#2E0D0D;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Montserrat',sans-serif;background:var(--plum);color:var(--text);min-height:100dvh;
+    background-image:
+      radial-gradient(600px 400px at 90% 0%, rgba(139,92,246,.22), transparent 70%),
+      radial-gradient(500px 500px at 0% 60%, rgba(244,114,182,.14), transparent 70%);
+    background-attachment:fixed;
+    display:flex;flex-direction:column;align-items:center;padding:0 18px 60px;
+  }
+  .px{font-family:'Geist Pixel','Press Start 2P',monospace;letter-spacing:.02em;line-height:1.4}
+  button,input,select,textarea{font-family:inherit}
+  button{cursor:pointer;border:none;background:none;color:inherit}
 
-    @media (max-width:768px){ .container{ margin:20px; padding:20px; } h2{ font-size:1.45em; } input,select,textarea,button{ font-size:0.95em; } }
-    @media (max-width:480px){ .container{ margin:12px; padding:16px; } h2{ font-size:1.25em; } .row{ flex-direction:column; } .btn{ width:100%; padding:10px; } }
-  </style>
+  /* Top bar */
+  .top{width:100%;max-width:640px;display:flex;align-items:center;gap:12px;padding:20px 0}
+  .top a{color:var(--text-soft);text-decoration:none;font-size:.85rem;font-weight:600}
+  .top a:hover{color:var(--text)}
+  .top .spacer{flex:1}
+  .assist-link{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.8rem;font-weight:600;text-decoration:none;color:var(--text)}
+
+  /* Card */
+  .card{width:100%;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:34px;box-shadow:0 24px 70px rgba(0,0,0,.45);animation:up .5s ease both}
+  @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  h1{font-size:clamp(.95rem,3vw,1.3rem);margin-bottom:10px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--text-soft);font-size:.9rem;margin-bottom:28px;line-height:1.6}
+
+  label{display:block;font-size:.78rem;font-weight:600;color:var(--text-soft);margin:18px 0 8px}
+  .box{display:flex;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;transition:border-color .2s,box-shadow .2s}
+  .box:focus-within{border-color:var(--violet);box-shadow:0 0 0 3px rgba(139,92,246,.22)}
+  input,select,textarea{flex:1;background:none;border:none;outline:none;padding:13px 15px;color:var(--text);font-size:.92rem;width:100%}
+  select{appearance:none;-webkit-appearance:none;cursor:pointer}
+  .box.select{position:relative}
+  .box.select::after{content:"▾";position:absolute;right:15px;color:var(--text-soft);pointer-events:none}
+  select option{background:var(--surface-2);color:var(--text)}
+  textarea{resize:vertical;min-height:110px;line-height:1.6}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip-btn{padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:.8rem;font-weight:600;transition:border-color .15s,transform .12s}
+  .chip-btn:hover{border-color:var(--violet)}
+  .chip-btn:active{transform:scale(.97)}
+
+  .map-container{display:none;margin-top:14px;border-radius:16px;overflow:hidden;border:1px solid var(--line);height:230px}
+  .map-container iframe{width:100%;height:100%;border:0;filter:saturate(.7)}
+
+  .ai-btn{width:100%;margin-top:22px;padding:14px;border-radius:14px;border:1px solid var(--violet);background:rgba(139,92,246,.12);color:var(--text);font-weight:700;font-size:.9rem;transition:background .2s}
+  .ai-btn:hover{background:rgba(139,92,246,.22)}
+  .ai-btn:disabled{opacity:.55;cursor:default}
+
+  /* AI panel with severity spine */
+  .ai-panel{display:none;margin-top:16px;padding:18px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--line)}
+  .ai-panel.low{border-left-color:var(--sev-low)} .ai-panel.medium{border-left-color:var(--sev-med)}
+  .ai-panel.high{border-left-color:var(--sev-high)} .ai-panel.critical{border-left-color:var(--sev-crit)}
+  .sev-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .sev-badge{padding:4px 12px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .sev-badge.low{background:var(--sev-low-bg);color:var(--sev-low)} .sev-badge.medium{background:var(--sev-med-bg);color:var(--sev-med)}
+  .sev-badge.high{background:var(--sev-high-bg);color:var(--sev-high)} .sev-badge.critical{background:var(--sev-crit-bg);color:var(--sev-crit)}
+  .escalated{font-size:.74rem;color:var(--sev-high);font-weight:700}
+  .ai-answer{white-space:pre-wrap;font-size:.9rem;line-height:1.65}
+  .ai-sources{margin-top:12px;font-size:.74rem;color:var(--text-soft)}
+  .ai-note{margin-top:10px;font-size:.7rem;color:var(--text-soft);border-top:1px dashed var(--line);padding-top:10px}
+
+  .status{margin-top:18px;font-size:.76rem;color:var(--text-soft)}
+  .status.ok{color:var(--sev-low)}
+
+  .submit{width:100%;margin-top:14px;padding:16px;border-radius:14px;background:var(--grad);color:#fff;font-weight:700;font-size:.98rem;position:relative;overflow:hidden;transition:transform .12s}
+  .submit:active{transform:scale(.98)}
+  .submit:disabled{opacity:.6}
+
+  .toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--line);padding:13px 26px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:80;transition:transform .35s;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  footer{margin-top:26px;font-size:.72rem;color:var(--text-soft)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-  <div class="container" id="app">
-    <h2>Need Help?</h2>
-    <p class="tagline">Fill out this quick form and someone nearby will reach out.</p>
 
-    <form id="helpForm" autocomplete="off">
-      <label for="name">Your Name</label>
-      <input id="name" type="text" required placeholder="e.g. Aisha">
+<div class="top">
+  <a href="assistant.html">← Assistant</a>
+  <div class="spacer"></div>
+  <a class="assist-link" href="assistant.html">✦ Ask AI instead</a>
+</div>
 
-      <label for="location">Your Location</label>
-      <div class="row">
-        <input id="location" type="text" required placeholder="Fetching your location...">
-        <button type="button" class="btn location-btn" id="btnLocation">📍 Share Live</button>
-        <button type="button" class="btn map-btn" id="btnMap">🗺 View on Map</button>
-      </div>
-      <div class="map-container" id="mapContainer">
-        <iframe id="mapFrame" loading="lazy"></iframe>
-      </div>
+<div class="card">
+  <h1 class="px">NEED HELP?</h1>
+  <p class="sub">Fill this quick form — nearby volunteers will be alerted and someone will reach out. For instant AI guidance while you wait, use the button below the form.</p>
 
-      <label for="type">Type of Help</label>
+  <form id="helpForm" autocomplete="off">
+    <label for="name">Your name</label>
+    <div class="box"><input id="name" type="text" required placeholder="e.g. Aisha"></div>
+
+    <label for="location">Your location</label>
+    <div class="box"><input id="location" type="text" required placeholder="Tap Share Live, or type it"></div>
+    <div class="row">
+      <button type="button" class="chip-btn" id="btnLocation">📍 Share live location</button>
+      <button type="button" class="chip-btn" id="btnMap">🗺 View on map</button>
+    </div>
+    <div class="map-container" id="mapContainer"><iframe id="mapFrame" loading="lazy" title="Your location on map"></iframe></div>
+
+    <label for="type">Type of help</label>
+    <div class="box select">
       <select id="type" required>
-        <option value="">-- Select Help Type --</option>
+        <option value="">— Select help type —</option>
         <option>Medical</option>
         <option>Emotional/Mental Support</option>
         <option>Safety/Escort</option>
@@ -59,208 +128,231 @@
         <option>Lost or Stranded</option>
         <option>Support for Women or LGBTQ+</option>
       </select>
+    </div>
 
-      <label for="description">Describe Your Situation</label>
-      <textarea id="description" placeholder="Briefly describe what you’re facing..." required></textarea>
+    <label for="description">Describe your situation</label>
+    <div class="box"><textarea id="description" required placeholder="Briefly describe what you're facing…"></textarea></div>
 
-      <button type="button" class="btn" id="btnAiGuidance" style="margin-top:10px;">🤖 Get Instant Guidance</button>
+    <button type="button" class="ai-btn" id="btnAiGuidance">✦ Get instant AI guidance</button>
 
-      <!-- AI guidance panel: shows retrieval-grounded steps while the human help request is (separately) sent -->
-      <div id="aiPanel" style="display:none; margin-top:14px; padding:14px; border-radius:8px; border:1px solid #cce5ff; background:#f4faff;">
-        <div id="aiSeverityBadge" style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; margin-bottom:8px;"></div>
-        <div id="aiAnswer" style="white-space:pre-wrap; font-size:0.95em; line-height:1.5;"></div>
-        <div id="aiSources" style="margin-top:8px; font-size:0.78em; color:#557;"></div>
-        <div style="margin-top:8px; font-size:0.78em; color:#a55;">This is AI-generated guidance grounded in general first-aid sources — not a substitute for emergency services or professional care.</div>
+    <div class="ai-panel" id="aiPanel">
+      <div class="sev-row">
+        <span class="sev-badge" id="aiSeverityBadge">low</span>
+        <span class="escalated" id="aiEscalated" style="display:none">⚠ Flagged for urgent attention</span>
       </div>
+      <div class="ai-answer" id="aiAnswer"></div>
+      <div class="ai-sources" id="aiSources"></div>
+      <div class="ai-note">AI-generated guidance grounded in general first-aid sources — not a substitute for emergency services or professional care.</div>
+    </div>
 
-      <div class="note small" id="status">Not connected to Firebase yet.</div>
+    <div class="ai-panel" id="nearbyPanel" style="display:none;border-left-color:var(--violet)">
+      <div class="sev-row"><span class="sev-badge" style="background:rgba(139,92,246,.18);color:var(--violet)">NEARBY SUPPORT</span></div>
+      <div id="nearbyList" style="font-size:.86rem;line-height:1.7"></div>
+      <div class="ai-note">Locations from OpenStreetMap — availability not guaranteed. In an emergency, call emergency services first.</div>
+    </div>
 
-      <button type="submit" id="submitBtn">Send Help Request</button>
-    </form>
-  </div>
+    <p class="status" id="status">Connecting to Firebase…</p>
+    <button type="submit" class="submit" id="submitBtn">Send help request →</button>
+  </form>
+</div>
 
-  <footer>
-    <p>© 2025 SAHARA Community | All rights reserved</p>
-  </footer>
+<footer>© 2026 SAHARA Community</footer>
+<div class="toast" id="toast"></div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAfhLcpJ19GFJfZ2gQMUI2QsNkkIRE9QkA",
+  authDomain: "sahara-ai-4e3ee.firebaseapp.com",
+  projectId: "sahara-ai-4e3ee",
+  storageBucket: "sahara-ai-4e3ee.firebasestorage.app",
+  messagingSenderId: "605933418886",
+  appId: "1:605933418886:web:111541a8b9fcb3945dd407"
+};
+const $ = id => document.getElementById(id);
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  $('status').textContent = "Connected — ready to send requests.";
+  $('status').classList.add('ok');
+} catch (e) {
+  console.error('Firebase init error:', e);
+  $('status').textContent = "⚠️ Firebase connection failed — request sending is unavailable.";
+}
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAfhLcpJ19GFJfZ2gQMUI2QsNkkIRE9QkA",
-      authDomain: "sahara-ai-4e3ee.firebaseapp.com",
-      projectId: "sahara-ai-4e3ee",
-      storageBucket: "sahara-ai-4e3ee.firebasestorage.app",
-      messagingSenderId: "605933418886",
-      appId: "1:605933418886:web:111541a8b9fcb3945dd407",
-      measurementId: "G-G5LXE5110B"
-    };
+/* ---------- Location ---------- */
+const TRIAGE_API_URL = 'http://localhost:8000/triage'; // change to deployed backend URL
+let currentCoords = null;
+let lastSeverity = null, lastEscalate = false; // saved with the request for volunteer triage
 
+$('btnLocation').addEventListener('click', () => {
+  if (!navigator.geolocation) { alert("Geolocation not supported on this device."); return; }
+  $('btnLocation').textContent = '📍 Getting…';
+  navigator.geolocation.getCurrentPosition(async pos => {
+    currentCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    // Reverse-geocode to a readable place name (best effort)
     try {
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      document.getElementById('status').textContent = "Connected to Firebase. Ready to send requests.";
-      window.db = db;
-    } catch (e) {
-      console.error('Firebase init error:', e);
-      document.getElementById('status').textContent = "⚠️ Firebase init failed — check console.";
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentCoords.lat}&lon=${currentCoords.lon}`);
+      const j = await r.json();
+      $('location').value = j.display_name || `${currentCoords.lat.toFixed(5)}, ${currentCoords.lon.toFixed(5)}`;
+    } catch {
+      $('location').value = `${currentCoords.lat.toFixed(5)}, ${currentCoords.lon.toFixed(5)}`;
     }
+    $('btnLocation').textContent = '📍 Location shared ✓';
+  }, () => {
+    alert("Couldn't get location — check browser permission.");
+    $('btnLocation').textContent = '📍 Share live location';
+  });
+});
 
-    // Get location with place name
-    let currentCoords = null;
-    document.getElementById('btnLocation').addEventListener('click', () => {
-      const locationInput = document.getElementById('location');
-      if (!navigator.geolocation) {
-        alert("Geolocation not supported.");
-        return;
-      }
-      document.getElementById('btnLocation').textContent = '📍 Getting...';
+$('btnMap').addEventListener('click', () => {
+  if (!currentCoords) { alert("Share your live location first."); return; }
+  const { lat, lon } = currentCoords;
+  $('mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.006},${lat-0.006},${lon+0.006},${lat+0.006}&layer=mapnik&marker=${lat},${lon}`;
+  $('mapContainer').style.display = 'block';
+});
 
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          currentCoords = { lat, lon };
+/* ---------- AI guidance (RAG backend) ---------- */
+$('btnAiGuidance').addEventListener('click', async () => {
+  const description = $('description').value.trim();
+  const type = $('type').value;
+  if (!description) { alert('Describe your situation first.'); return; }
 
-          try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-            const data = await res.json();
-            locationInput.value = data.display_name || `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
-          } catch {
-            locationInput.value = `Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}`;
-          }
+  const btn = $('btnAiGuidance');
+  btn.disabled = true; btn.textContent = '✦ Thinking…';
+  $('aiPanel').style.display = 'none';
 
-          document.getElementById('btnLocation').textContent = '📍 Share Live';
-        },
-        () => {
-          alert("Unable to access location.");
-          document.getElementById('btnLocation').textContent = '📍 Share Live';
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+  try {
+    const res = await fetch(TRIAGE_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: description, help_type: type || null })
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
 
-    // Map preview button
-    document.getElementById('btnMap').addEventListener('click', () => {
-      if (!currentCoords) {
-        alert("Please fetch your location first.");
-        return;
-      }
-      const { lat, lon } = currentCoords;
-      document.getElementById('mapFrame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.01},${lat-0.01},${lon+0.01},${lat+0.01}&layer=mapnik&marker=${lat},${lon}`;
-      document.getElementById('mapContainer').style.display = 'block';
+    const sev = (data.severity || 'low').toLowerCase();
+    lastSeverity = sev; lastEscalate = !!data.escalate;
+    const panel = $('aiPanel');
+    panel.className = 'ai-panel ' + sev;
+    const badge = $('aiSeverityBadge');
+    badge.className = 'sev-badge ' + sev;
+    badge.textContent = sev;
+    $('aiEscalated').style.display = data.escalate ? 'inline' : 'none';
+    $('aiAnswer').textContent = data.answer;
+    $('aiSources').textContent = (data.retrieved_sources && data.retrieved_sources.length)
+      ? 'Based on: ' + data.retrieved_sources.map(s => `${s.condition} (${s.source})`).join(' · ')
+      : '';
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // For medical or urgent cases, also show nearby hospitals/support
+    const medical = (type === 'Medical') || ['high','critical'].includes(sev);
+    if (medical) showNearbySupport();
+  } catch (err) {
+    console.error('Triage failed:', err);
+    toast('AI guidance unavailable — your help request below still works.');
+  } finally {
+    btn.disabled = false; btn.textContent = '✦ Get instant AI guidance';
+  }
+});
+
+/* ---------- Submit help request to Firestore ---------- */
+$('helpForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  if (!db) { toast('Cannot send — Firebase not connected.'); return; }
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await db.collection('help_requests').add({
+      name: $('name').value.trim(),
+      location: $('location').value.trim(),
+      coords: currentCoords,
+      type: $('type').value,
+      description: $('description').value.trim(),
+      severity: lastSeverity,          // null if AI guidance wasn't used
+      aiEscalated: lastEscalate,
+      assignedTo: null,
+      status: 'open',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    $('helpForm').reset();
+    $('aiPanel').style.display = 'none';
+    $('mapContainer').style.display = 'none';
+    $('btnLocation').textContent = '📍 Share live location';
+    toast('✓ Request sent — nearby volunteers will be notified.');
+  } catch (e) {
+    console.error('Submit failed:', e);
+    toast('Could not send request — try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send help request →';
+  }
+});
 
-    // --- AI guidance (RAG-powered) ---
-    // Point this at your deployed backend, e.g. https://your-app.onrender.com
-    const TRIAGE_API_URL = 'http://localhost:8000/triage';
+/* ---------- Nearby hospitals & support (OpenStreetMap Overpass) ---------- */
+async function showNearbySupport() {
+  const list = $('nearbyList');
+  const panel = $('nearbyPanel');
+  panel.style.display = 'block';
 
-    const severityColors = {
-      low:      { bg: '#e6f4ea', fg: '#1a7f37' },
-      medium:   { bg: '#fff8e1', fg: '#b8860b' },
-      high:     { bg: '#ffe9e0', fg: '#c0392b' },
-      critical: { bg: '#ffdcdc', fg: '#a80000' }
-    };
+  if (!currentCoords) {
+    list.innerHTML = `Share your live location to see nearby hospitals.<br>
+      <a href="https://www.google.com/maps/search/hospitals+near+me" target="_blank" rel="noopener" style="color:var(--pink)">Open "hospitals near me" in Google Maps →</a>`;
+    return;
+  }
 
-    document.getElementById('btnAiGuidance').addEventListener('click', async () => {
-      const description = document.getElementById('description').value.trim();
-      const type = document.getElementById('type').value;
-      const aiBtn = document.getElementById('btnAiGuidance');
-      const panel = document.getElementById('aiPanel');
+  list.textContent = 'Finding nearby hospitals…';
+  const { lat, lon } = currentCoords;
+  const query = `[out:json][timeout:10];(node["amenity"~"hospital|clinic"](around:4000,${lat},${lon});way["amenity"~"hospital|clinic"](around:4000,${lat},${lon}););out center 8;`;
 
-      if (!description) {
-        alert('Please describe your situation first.');
-        return;
-      }
+  try {
+    const r = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
+    const j = await r.json();
+    const places = (j.elements || [])
+      .map(el => ({
+        name: (el.tags && el.tags.name) || 'Unnamed medical facility',
+        lat: el.lat || (el.center && el.center.lat),
+        lon: el.lon || (el.center && el.center.lon)
+      }))
+      .filter(p => p.lat && p.lon)
+      .map(p => ({ ...p, dist: haversineKm(lat, lon, p.lat, p.lon) }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, 5);
 
-      aiBtn.disabled = true;
-      aiBtn.textContent = 'Thinking...';
-      panel.style.display = 'none';
+    if (!places.length) throw new Error('none found');
 
-      try {
-        const res = await fetch(TRIAGE_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: description, help_type: type || null })
-        });
+    list.innerHTML = places.map(p =>
+      `🏥 <strong>${escHtml(p.name)}</strong> — ${p.dist.toFixed(1)} km
+       · <a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}" target="_blank" rel="noopener" style="color:var(--pink)">Directions →</a>`
+    ).join('<br>');
+  } catch {
+    list.innerHTML = `Couldn't load nearby facilities right now.<br>
+      <a href="https://www.google.com/maps/search/hospitals/@${lat},${lon},14z" target="_blank" rel="noopener" style="color:var(--pink)">Open hospitals near you in Google Maps →</a>`;
+  }
+}
+function haversineKm(a, b, c, d) {
+  const R = 6371, dLat = (c - a) * Math.PI / 180, dLon = (d - b) * Math.PI / 180;
+  const s = Math.sin(dLat/2)**2 + Math.cos(a*Math.PI/180) * Math.cos(c*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s));
+}
+function escHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-        if (!res.ok) throw new Error(`Server responded ${res.status}`);
-        const data = await res.json();
+/* ---------- Toast ---------- */
+let tT;
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3200); }
 
-        const sev = (data.severity || 'low').toLowerCase();
-        const colors = severityColors[sev] || severityColors.low;
-        const badge = document.getElementById('aiSeverityBadge');
-        badge.textContent = data.escalate
-          ? `⚠ ${sev.toUpperCase()} — flagged for urgent attention`
-          : `Severity: ${sev}`;
-        badge.style.background = colors.bg;
-        badge.style.color = colors.fg;
-
-        document.getElementById('aiAnswer').textContent = data.answer;
-
-        const sourcesEl = document.getElementById('aiSources');
-        if (data.retrieved_sources && data.retrieved_sources.length) {
-          sourcesEl.textContent = 'Based on: ' + data.retrieved_sources
-            .map(s => `${s.condition} (${s.source})`)
-            .join(' · ');
-        } else {
-          sourcesEl.textContent = '';
-        }
-
-        panel.style.display = 'block';
-      } catch (err) {
-        console.error('Triage request failed:', err);
-        alert('Could not reach the AI guidance service. Your help request can still be sent below.');
-      } finally {
-        aiBtn.disabled = false;
-        aiBtn.textContent = '🤖 Get Instant Guidance';
-      }
-    });
-
-    // Submit form
-    document.getElementById('helpForm').addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      const name = document.getElementById('name').value.trim();
-      const location = document.getElementById('location').value.trim();
-      const type = document.getElementById('type').value;
-      const description = document.getElementById('description').value.trim();
-
-      if (!name || !location || !type || !description) {
-        alert('Please fill all fields.');
-        btn.disabled = false;
-        btn.textContent = 'Send Help Request';
-        return;
-      }
-
-      if (!window.firebase || !window.db) {
-        alert('Firebase not initialized.');
-        btn.disabled = false;
-        btn.textContent = 'Send Help Request';
-        return;
-      }
-
-      try {
-        await db.collection('help_requests').add({
-          name, location, type, description,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert('✅ Request submitted. Stay safe.');
-        document.getElementById('helpForm').reset();
-        document.getElementById('mapContainer').style.display = 'none';
-      } catch (error) {
-        console.error('Firestore add error:', error);
-        alert('❌ Something went wrong.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Send Help Request';
-      }
-    });
-  </script>
+/* SOS deep-link support (from app/login pages): ?sos=1&lat=..&lon=.. */
+const p = new URLSearchParams(location.search);
+if (p.get('sos') === '1') {
+  $('type').value = 'Safety/Escort';
+  $('description').value = 'SOS triggered — immediate assistance needed.';
+  if (p.get('lat') && p.get('lon')) {
+    currentCoords = { lat: +p.get('lat'), lon: +p.get('lon') };
+    $('location').value = `${currentCoords.lat.toFixed(5)}, ${currentCoords.lon.toFixed(5)}`;
+  }
+}
+</script>
 </body>
 </html>

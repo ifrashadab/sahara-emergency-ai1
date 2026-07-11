@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAHARA — Volunteer</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  :root{
+    --plum:#1A0E1E;--surface:#26142E;--surface-2:#331B3D;--line:#43254F;
+    --violet:#8B5CF6;--pink:#F472B6;--red:#EF4444;
+    --text:#F5EFF9;--text-soft:#B69FC4;--grad:linear-gradient(135deg,var(--violet),var(--pink));
+    --sev-low:#34D399;--sev-low-bg:#0E2A1F;--sev-med:#FBBF24;--sev-med-bg:#2C230C;
+    --sev-high:#FB7185;--sev-high-bg:#2E1218;--sev-crit:#EF4444;--sev-crit-bg:#2E0D0D;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--plum);color:var(--text);min-height:100dvh;
+    background-image:radial-gradient(600px 400px at 90% 0%,rgba(139,92,246,.2),transparent 70%),radial-gradient(500px 500px at 0% 70%,rgba(244,114,182,.12),transparent 70%);
+    background-attachment:fixed;padding:0 18px 60px}
+  .px{font-family:'Geist Pixel','Press Start 2P',monospace;letter-spacing:.02em;line-height:1.4}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  .top{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:20px 0;flex-wrap:wrap}
+  .top .brand{font-weight:700;display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800}
+  .spacer{flex:1}
+  .karma-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.78rem;font-weight:700}
+  .karma-chip .px{font-size:.68rem;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .avail{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:.76rem;font-weight:700}
+  .avail .sw{width:38px;height:20px;border-radius:999px;background:var(--surface-2);position:relative;transition:background .2s}
+  .avail .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text-soft);transition:transform .2s,background .2s}
+  .avail.on .sw{background:rgba(52,211,153,.3)}
+  .avail.on .sw::after{transform:translateX(18px);background:var(--sev-low)}
+  .nav-links{display:flex;gap:14px;font-size:.8rem;color:var(--text-soft)}
+  .nav-links a:hover{color:var(--text)}
+
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:clamp(.95rem,2.6vw,1.25rem);margin:18px 0 6px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--text-soft);font-size:.86rem;margin-bottom:22px}
+
+  /* Active case banner */
+  .active-case{display:none;background:var(--surface);border:1px solid var(--violet);border-left:4px solid var(--violet);border-radius:18px;padding:20px;margin-bottom:26px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+  .active-case h2{font-size:.95rem;margin-bottom:10px}
+  .active-case .meta{font-size:.82rem;color:var(--text-soft);line-height:1.7;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{padding:12px 22px;border-radius:12px;font-weight:700;font-size:.85rem;transition:transform .12s}
+  .btn:active{transform:scale(.97)}
+  .btn.grad{background:var(--grad);color:#fff}
+  .btn.ghost{border:1px solid var(--line);background:var(--surface-2)}
+  .btn.danger{border:1px solid var(--sev-high);color:var(--sev-high);background:rgba(251,113,133,.08)}
+
+  /* Filters */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .f-chip{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.76rem;font-weight:600;color:var(--text-soft)}
+  .f-chip.on{border-color:var(--violet);color:var(--text);background:rgba(139,92,246,.14)}
+
+  /* Request cards */
+  .list{display:flex;flex-direction:column;gap:12px}
+  .req{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:16px;padding:18px;animation:up .35s ease both}
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .req.low{border-left-color:var(--sev-low)}.req.medium{border-left-color:var(--sev-med)}
+  .req.high{border-left-color:var(--sev-high)}.req.critical{border-left-color:var(--sev-crit)}
+  .req-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .sev-badge{padding:3px 11px;border-radius:999px;font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+  .sev-badge.low{background:var(--sev-low-bg);color:var(--sev-low)}.sev-badge.medium{background:var(--sev-med-bg);color:var(--sev-med)}
+  .sev-badge.high{background:var(--sev-high-bg);color:var(--sev-high)}.sev-badge.critical{background:var(--sev-crit-bg);color:var(--sev-crit)}
+  .sev-badge.none{background:var(--surface-2);color:var(--text-soft)}
+  .type-chip{font-size:.72rem;color:var(--text-soft);font-weight:600}
+  .req time{margin-left:auto;font-size:.7rem;color:var(--text-soft)}
+  .req .desc{font-size:.9rem;line-height:1.6;margin-bottom:6px}
+  .req .loc{font-size:.76rem;color:var(--text-soft);margin-bottom:12px}
+  .req .who{font-size:.78rem;color:var(--text-soft)}
+
+  .empty{padding:60px 20px;text-align:center;color:var(--text-soft);font-size:.9rem;border:1px dashed var(--line);border-radius:18px}
+  .empty .px{display:block;font-size:.8rem;margin-bottom:12px;color:var(--text)}
+
+  .toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--line);padding:13px 26px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:80;transition:transform .35s;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="brand" href="assistant.html"><span class="logo">S</span>SAHARA · Volunteer</a>
+  <div class="spacer"></div>
+  <button class="avail" id="availBtn"><span id="availLabel">Off duty</span><span class="sw"></span></button>
+  <a class="karma-chip" href="rewards.html">★ <span class="px" id="karmaChip">0 PTS</span></a>
+  <nav class="nav-links"><a href="profile.html">Profile</a><a href="rewards.html">Rewards</a></nav>
+</div>
+
+<div class="wrap">
+  <!-- Active case -->
+  <div class="active-case" id="activeCase">
+    <h2 class="px">YOUR ACTIVE CASE</h2>
+    <div class="meta" id="activeMeta"></div>
+    <div class="row">
+      <a class="btn grad" id="activeDirections" target="_blank" rel="noopener">Directions →</a>
+      <button class="btn ghost" id="resolveBtn">✓ Mark resolved</button>
+      <button class="btn danger" id="abandonBtn">Release case</button>
+    </div>
+  </div>
+
+  <h1 class="px">OPEN REQUESTS NEAR YOU</h1>
+  <p class="sub">Live feed — new requests appear automatically. Accepting assigns the case to you and notifies the requester.</p>
+
+  <div class="filters" id="filters">
+    <button class="f-chip on" data-f="all">All</button>
+    <button class="f-chip" data-f="critical">Critical</button>
+    <button class="f-chip" data-f="high">High</button>
+    <button class="f-chip" data-f="Medical">Medical</button>
+    <button class="f-chip" data-f="Safety/Escort">Safety</button>
+    <button class="f-chip" data-f="Emotional/Mental Support">Mental health</button>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty" style="display:none">
+    <span class="px">ALL QUIET RIGHT NOW</span>
+    No open requests in the feed. Keep availability on — new requests appear here instantly.
+    <br><br><a href="profile.html" style="color:var(--pink)">Complete your volunteer profile →</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAfhLcpJ19GFJfZ2gQMUI2QsNkkIRE9QkA",
+  authDomain: "sahara-ai-4e3ee.firebaseapp.com",
+  projectId: "sahara-ai-4e3ee",
+  storageBucket: "sahara-ai-4e3ee.firebasestorage.app",
+  messagingSenderId: "605933418886",
+  appId: "1:605933418886:web:111541a8b9fcb3945dd407"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.firestore();
+const $ = id => document.getElementById(id);
+const KARMA_API = 'http://localhost:8000/karma/award'; // deployed URL later
+
+let me = null, myDoc = null, requests = [], filter = 'all', unsubFeed = null;
+
+/* ---------- Auth guard ---------- */
+auth.onAuthStateChanged(async user => {
+  if (!user) { location.href = 'login.html'; return; }
+  me = user;
+  const ref = db.collection('users').doc(me.uid);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    await ref.set({
+      displayName: me.displayName || me.email,
+      email: me.email,
+      volunteer: { active: true, available: false, skills: [], radiusKm: 5 },
+      karma: { lifetime: 0, spendable: 0 },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  ref.onSnapshot(s => {
+    myDoc = s.data() || {};
+    const k = (myDoc.karma && myDoc.karma.lifetime) || 0;
+    $('karmaChip').textContent = k.toLocaleString() + ' PTS';
+    const on = !!(myDoc.volunteer && myDoc.volunteer.available);
+    $('availBtn').classList.toggle('on', on);
+    $('availLabel').textContent = on ? 'Available' : 'Off duty';
+  });
+  watchFeed();
+  watchMyCase();
+});
+
+/* ---------- Availability toggle ---------- */
+$('availBtn').onclick = async () => {
+  const on = !$('availBtn').classList.contains('on');
+  await db.collection('users').doc(me.uid).set({ volunteer: { available: on } }, { merge: true });
+  toast(on ? 'You are now available for cases.' : 'Off duty — you will not be matched.');
+};
+
+/* ---------- Live open-requests feed ---------- */
+function watchFeed() {
+  if (unsubFeed) unsubFeed();
+  unsubFeed = db.collection('help_requests')
+    .where('status', '==', 'open')
+    .orderBy('createdAt', 'desc')
+    .limit(30)
+    .onSnapshot(qs => {
+      requests = qs.docs.map(d => ({ id: d.id, ...d.data() }));
+      render();
+    }, err => { console.error(err); toast('Feed error — check Firestore rules/index.'); });
+}
+
+const sevRank = { critical: 0, high: 1, medium: 2, low: 3, none: 4 };
+function render() {
+  const list = $('list'); list.innerHTML = '';
+  let items = requests.filter(r => {
+    if (filter === 'all') return true;
+    if (['critical','high'].includes(filter)) return (r.severity || 'none') === filter;
+    return r.type === filter;
+  });
+  items.sort((a,b) => (sevRank[a.severity||'none'] - sevRank[b.severity||'none']));
+  $('empty').style.display = items.length ? 'none' : 'block';
+
+  items.forEach(r => {
+    const sev = r.severity || 'none';
+    const el = document.createElement('div');
+    el.className = 'req ' + sev;
+    const when = r.createdAt && r.createdAt.toDate ? timeAgo(r.createdAt.toDate()) : '';
+    el.innerHTML = `
+      <div class="req-head">
+        <span class="sev-badge ${sev}">${sev === 'none' ? 'untriaged' : sev}</span>
+        <span class="type-chip">${esc(r.type || 'General')}</span>
+        ${r.aiEscalated ? '<span class="type-chip" style="color:var(--sev-high)">⚠ AI-flagged</span>' : ''}
+        <time>${when}</time>
+      </div>
+      <div class="desc">${esc(r.description || '')}</div>
+      <div class="loc">📍 ${esc(r.location || 'Location not shared')}</div>
+      <div class="row" style="align-items:center">
+        <span class="who">From ${esc(r.name || 'Anonymous')}</span>
+        <span style="flex:1"></span>
+        <button class="btn grad" data-accept="${r.id}">Accept case</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  list.querySelectorAll('[data-accept]').forEach(b => b.onclick = () => acceptCase(b.dataset.accept, b));
+}
+
+/* ---------- Transactional accept (no double-assignment) ---------- */
+async function acceptCase(id, btn) {
+  if (!myDoc || !(myDoc.volunteer && myDoc.volunteer.available)) {
+    toast('Switch to Available (top bar) before accepting.'); return;
+  }
+  btn.disabled = true; btn.textContent = 'Accepting…';
+  const ref = db.collection('help_requests').doc(id);
+  try {
+    await db.runTransaction(async t => {
+      const s = await t.get(ref);
+      if (!s.exists) throw new Error('gone');
+      const d = s.data();
+      if (d.status !== 'open' || d.assignedTo) throw new Error('taken');
+      t.update(ref, {
+        status: 'assigned',
+        assignedTo: me.uid,
+        assignedToName: myDoc.displayName || me.email,
+        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    awardKarma('accept', id); // +100, server-side, fire-and-forget
+    toast('Case accepted — the requester can now see you are coming.');
+  } catch (e) {
+    toast(e.message === 'taken' ? 'Another volunteer already took this case.' : 'Could not accept — try again.');
+  }
+}
+
+/* ---------- My active case ---------- */
+let activeId = null;
+function watchMyCase() {
+  db.collection('help_requests')
+    .where('assignedTo', '==', auth.currentUser.uid)
+    .where('status', '==', 'assigned')
+    .limit(1)
+    .onSnapshot(qs => {
+      const box = $('activeCase');
+      if (qs.empty) { box.style.display = 'none'; activeId = null; return; }
+      const d = qs.docs[0]; activeId = d.id;
+      const r = d.data();
+      $('activeMeta').innerHTML =
+        `<strong>${esc(r.name || 'Anonymous')}</strong> · ${esc(r.type || '')} · severity: ${esc(r.severity || 'untriaged')}<br>` +
+        `${esc(r.description || '')}<br>📍 ${esc(r.location || 'no location')}`;
+      const dir = $('activeDirections');
+      if (r.coords && r.coords.lat) {
+        dir.style.display = '';
+        dir.href = `https://www.google.com/maps/dir/?api=1&destination=${r.coords.lat},${r.coords.lon}`;
+      } else dir.style.display = 'none';
+      box.style.display = 'block';
+    });
+}
+
+$('resolveBtn').onclick = async () => {
+  if (!activeId) return;
+  await db.collection('help_requests').doc(activeId).update({
+    status: 'resolved',
+    resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  awardKarma('resolve', activeId); // +250 server-side
+  toast('Case resolved — thank you. Karma incoming ★');
+};
+
+$('abandonBtn').onclick = async () => {
+  if (!activeId) return;
+  if (!confirm('Release this case back to the open feed?')) return;
+  await db.collection('help_requests').doc(activeId).update({
+    status: 'open', assignedTo: null, assignedToName: null, assignedAt: null
+  });
+  toast('Case released back to the feed.');
+};
+
+/* ---------- Karma via backend (never client-written) ---------- */
+async function awardKarma(action, caseId) {
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    await fetch(KARMA_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken, action, caseId })
+    });
+  } catch (e) { console.warn('karma award failed (backend offline?)', e); }
+}
+
+/* ---------- Filters / utils ---------- */
+document.querySelectorAll('.f-chip').forEach(c => c.onclick = () => {
+  document.querySelectorAll('.f-chip').forEach(x => x.classList.remove('on'));
+  c.classList.add('on'); filter = c.dataset.f; render();
+});
+function timeAgo(d){ const m=Math.floor((Date.now()-d)/60000); if(m<1)return 'just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); return h<24? h+'h ago' : Math.floor(h/24)+'d ago'; }
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let tT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3200); }
+</script>
+</body>
+</html>

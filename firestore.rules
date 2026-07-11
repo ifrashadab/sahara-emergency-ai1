@@ -1,0 +1,55 @@
+rules_version = '2';
+// SAHARA Firestore rules — Phase 1 volunteer feature.
+// Paste into Firebase console → Firestore Database → Rules → Publish.
+// Replaces test mode. Karma fields are protected: only the backend
+// (Admin SDK, which bypasses rules) can change karma.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    // client may never write karma — Admin SDK (backend) bypasses rules
+    function karmaUntouched() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['karma']);
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn();            // needed for leaderboard/matching
+      allow create: if isSelf(uid) &&
+        !('karma' in request.resource.data) ||
+        (isSelf(uid) && request.resource.data.karma == {'lifetime': 0, 'spendable': 0});
+      allow update: if isSelf(uid) && karmaUntouched();
+      allow delete: if isSelf(uid);
+    }
+
+    match /help_requests/{id} {
+      // anyone signed in may create a request for help
+      allow create: if signedIn()
+        && request.resource.data.status == 'open'
+        && request.resource.data.assignedTo == null;
+
+      // volunteers browse open requests; participants read their own cases
+      allow read: if signedIn();
+
+      // Accept: open -> assigned, only assigning to yourself
+      allow update: if signedIn() && (
+        (resource.data.status == 'open'
+          && request.resource.data.status == 'assigned'
+          && request.resource.data.assignedTo == request.auth.uid)
+        // Resolve or release: only the assigned volunteer
+        || (resource.data.assignedTo == request.auth.uid
+          && request.resource.data.status in ['resolved', 'open'])
+      );
+
+      allow delete: if false;
+    }
+
+    match /redemptions/{id} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow update, delete: if false;   // admin fulfills via console/Admin SDK
+    }
+  }
+}

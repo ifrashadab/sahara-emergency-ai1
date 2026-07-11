@@ -1,535 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Your Profile - SAHARA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Toastify CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
-
-  <style>
-:root {
-  --primary: #0ea5e9;
-  --primary-dark: #0284c7;
-  --secondary: #06b6d4;
-  --accent: #38bdf8;
-  --success: #0284c7;
-  --danger: #ef4444;
-  --warning: #38bdf8;
-  --dark: #0f172a;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
-  --white: #ffffff;
-  --bg-primary: #f1f5f9;
-  --bg-secondary: #e2e8f0;
-  --bg-card: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.7;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(14, 165, 233, 0.03) 50%, var(--bg-secondary) 100%);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
-.rule-box { 
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(6, 182, 212, 0.1) 50%, rgba(56, 189, 248, 0.05) 100%);
-  border-bottom: 2px solid rgba(14, 165, 233, 0.2);
-  padding: 25px 20px;
-  text-align: center;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-  position: relative;
-  overflow: hidden;
-}
-
-.rule-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.rule-box strong {
-  color: var(--primary);
-}
-
-.profile-section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 50px;
-  padding: 60px 20px;
-  position: relative;
-}
-
-.profile-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
-              radial-gradient(circle at 70% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.profile-section > * {
-  position: relative;
-  z-index: 2;
-}
-
-.profile-pic {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.2);
-  border: 4px solid rgba(14, 165, 233, 0.1);
-  transition: all 0.3s ease;
-}
-
-.profile-pic:hover {
-  transform: scale(1.05);
-  box-shadow: 0 25px 80px rgba(14, 165, 233, 0.3);
-}
-
-.profile-pic img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.karma-summary {
-  max-width: 500px;
-  text-align: left;
-}
-
-.karma-summary h3 {
-  color: var(--primary-dark);
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.karma-total {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(14, 165, 233, 0.15);
-  padding: 20px 25px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.1);
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 30px;
-  color: var(--primary-dark);
-  position: relative;
-  overflow: hidden;
-}
-
-.karma-total::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.02) 0%, rgba(56, 189, 248, 0.05) 100%);
-  pointer-events: none;
-}
-
-.karma-bar {
-  margin-bottom: 25px;
-}
-
-.karma-bar h4 {
-  margin: 0 0 12px;
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.bar {
-  background: rgba(14, 165, 233, 0.08);
-  border-radius: 12px;
-  overflow: hidden;
-  height: 28px;
-  margin-bottom: 8px;
-  position: relative;
-  box-shadow: inset 0 2px 4px rgba(14, 165, 233, 0.1);
-}
-
-.bar-fill {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  height: 100%;
-  text-align: right;
-  padding-right: 15px;
-  color: var(--white);
-  line-height: 28px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 12px;
-  position: relative;
-  transition: all 0.3s ease;
-  user-select: none;
-}
-
-.bar-fill::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
-  animation: shimmer 2s infinite;
-  pointer-events: none;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-input[type="range"] {
-  width: 100%;
-  cursor: pointer;
-  -webkit-appearance: none;
-  background: transparent;
-  margin-top: 5px;
-}
-
-input[type="range"]:focus {
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  cursor: pointer;
-  border-radius: 50%;
-  border: none;
-  box-shadow: 0 0 5px rgba(14, 165, 233, 0.7);
-  transition: background 0.3s ease;
-  position: relative;
-  z-index: 3;
-}
-
-input[type="range"]::-webkit-slider-thumb:hover {
-  background: var(--secondary);
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  cursor: pointer;
-  border-radius: 50%;
-  border: none;
-  box-shadow: 0 0 5px rgba(14, 165, 233, 0.7);
-  transition: background 0.3s ease;
-  position: relative;
-  z-index: 3;
-}
-
-input[type="range"]::-moz-range-thumb:hover {
-  background: var(--secondary);
-}
-
-.button-container {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 10px; /* space between buttons */
-  margin-top: 20px;
-}
-
-.button-group {
-  margin-top: 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-}
-
-.action-button {
-  padding: 14px 24px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: var(--white);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  font-family: inherit;
-}
-
-.action-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.action-button:hover::before {
-  left: 100%;
-}
-
-.action-button:hover {
-  background: linear-gradient(135deg, var(--secondary), var(--accent));
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3);
-}
-
-footer {
-  text-align: center;
-  padding: 25px 20px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  border-top: 1px solid rgba(14, 165, 233, 0.1);
-  font-weight: 500;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .profile-section {
-    gap: 30px;
-    padding: 40px 15px;
-  }
-  
-  .profile-pic {
-    width: 180px;
-    height: 180px;
-  }
-  
-  .karma-summary {
-    max-width: 100%;
-  }
-  
-  .karma-summary h3 {
-    font-size: 1.3rem;
-    text-align: center;
-  }
-  
-  .karma-total {
-    font-size: 1.2rem;
-    text-align: center;
-  }
-  
-  .button-group {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .profile-pic {
-    width: 150px;
-    height: 150px;
-  }
-  
-  .rule-box {
-    font-size: 1rem;
-    padding: 20px 15px;
-  }
-  
-  .karma-total {
-    font-size: 1.1rem;
-    padding: 18px 20px;
-  }
-  
-  .button-group {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .action-button {
-    padding: 12px 20px;
-    font-size: 0.95rem;
-  }
-}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAHARA — Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  :root{--plum:#1A0E1E;--surface:#26142E;--surface-2:#331B3D;--line:#43254F;--violet:#8B5CF6;--pink:#F472B6;
+    --text:#F5EFF9;--text-soft:#B69FC4;--grad:linear-gradient(135deg,var(--violet),var(--pink));--sev-low:#34D399}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--plum);color:var(--text);min-height:100dvh;
+    background-image:radial-gradient(600px 400px at 90% 0%,rgba(139,92,246,.2),transparent 70%);background-attachment:fixed;
+    display:flex;flex-direction:column;align-items:center;padding:0 18px 60px}
+  .px{font-family:'Geist Pixel','Press Start 2P',monospace;letter-spacing:.02em;line-height:1.4}
+  button,input{font-family:inherit}button{cursor:pointer;border:none;background:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+  .top{width:100%;max-width:640px;display:flex;align-items:center;padding:20px 0;gap:12px}
+  .top a{color:var(--text-soft);font-size:.85rem;font-weight:600}.top a:hover{color:var(--text)}
+  .spacer{flex:1}
+  .card{width:100%;max-width:640px;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:34px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+  h1{font-size:clamp(.95rem,2.6vw,1.2rem);margin-bottom:6px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--text-soft);font-size:.85rem;margin-bottom:24px}
+  label{display:block;font-size:.78rem;font-weight:600;color:var(--text-soft);margin:20px 0 8px}
+  .box{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;display:flex}
+  .box:focus-within{border-color:var(--violet)}
+  input{flex:1;background:none;border:none;outline:none;padding:13px 15px;color:var(--text);font-size:.92rem}
+  .skills{display:flex;gap:8px;flex-wrap:wrap}
+  .skill{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);font-size:.78rem;font-weight:600;color:var(--text-soft);transition:all .15s}
+  .skill.on{border-color:var(--violet);color:var(--text);background:rgba(139,92,246,.16)}
+  .radius-row{display:flex;align-items:center;gap:14px}
+  input[type=range]{accent-color:var(--violet);flex:1;padding:0}
+  .radius-val{font-size:.85rem;font-weight:700;min-width:52px;text-align:right}
+  .toggle-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+  .toggle-row:last-of-type{border-bottom:none}
+  .toggle-row small{display:block;color:var(--text-soft);font-size:.74rem;margin-top:2px}
+  .sw{width:42px;height:22px;border-radius:999px;background:var(--surface-2);position:relative;flex-shrink:0;margin-left:auto;transition:background .2s}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--text-soft);transition:transform .2s,background .2s}
+  .sw.on{background:rgba(52,211,153,.3)}.sw.on::after{transform:translateX(20px);background:var(--sev-low)}
+  .save{width:100%;margin-top:26px;padding:15px;border-radius:14px;background:var(--grad);color:#fff;font-weight:700;font-size:.95rem}
+  .logout{width:100%;margin-top:12px;padding:13px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);font-weight:600;font-size:.85rem;color:var(--text-soft)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  .stat{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat b{display:block;font-size:1.1rem}.stat span{font-size:.68rem;color:var(--text-soft)}
+  .toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--line);padding:13px 26px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:80;transition:transform .35s}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
 </head>
 <body>
 
-  <!-- Rule Box -->
-  <div class="rule-box">
-    For every help you provide, you earn <strong>+10 Karma Points</strong> 💙
+<div class="top">
+  <a href="volunteer.html">← Volunteer feed</a>
+  <div class="spacer"></div>
+  <a href="rewards.html">Rewards →</a>
+</div>
+
+<div class="card">
+  <h1 class="px">VOLUNTEER PROFILE</h1>
+  <p class="sub">Your skills and coverage decide which cases reach you.</p>
+
+  <label>My impact</label>
+  <div class="stats">
+    <div class="stat"><b id="stCases">0</b><span>cases resolved</span></div>
+    <div class="stat"><b id="stKarma">0</b><span>lifetime karma</span></div>
+    <div class="stat"><b id="stActive">—</b><span>availability</span></div>
   </div>
 
-  <!-- Profile Info -->
-  <section class="profile-section">
-    <!-- Image -->
-    <div class="profile-pic">
-      <img src="images/user.jpg" alt="Your Photo">
-    </div>
+  <label for="name">Display name</label>
+  <div class="box"><input id="name" type="text" placeholder="Shown to requesters after you accept"></div>
 
-    <!-- Karma Summary -->
-    <div class="karma-summary">
-      <h3>Your Karma Stats</h3>
-      <div class="karma-total" id="total-karma">Total Karma Points: 260</div>
+  <label for="phone">Phone (shown only on accepted cases)</label>
+  <div class="box"><input id="phone" type="tel" placeholder="+91…"></div>
 
-      <div class="karma-bar">
-        <h4>1. Medical Help</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-1" style="width: 70%;">70</div>
-        </div>
-        <input type="range" min="0" max="100" value="70" id="slider-1" oninput="updateKarmaBar(1)" />
-      </div>
+  <label>Skills / areas I can help with</label>
+  <div class="skills" id="skills">
+    <button class="skill" data-s="Medical">🚑 Medical</button>
+    <button class="skill" data-s="Emotional/Mental Support">💜 Mental support</button>
+    <button class="skill" data-s="Safety/Escort">🛡 Safety/Escort</button>
+    <button class="skill" data-s="Minor Technical Help">🔧 Technical</button>
+    <button class="skill" data-s="Lost or Stranded">🧭 Lost/Stranded</button>
+    <button class="skill" data-s="Support for Women or LGBTQ+">🏳️‍🌈 Women/LGBTQ+</button>
+  </div>
 
-      <div class="karma-bar">
-        <h4>2. Emotional/Mental Support</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-2" style="width: 50%;">50</div>
-        </div>
-        <input type="range" min="0" max="100" value="50" id="slider-2" oninput="updateKarmaBar(2)" />
-      </div>
+  <label>Coverage radius</label>
+  <div class="radius-row">
+    <input type="range" id="radius" min="1" max="15" value="5">
+    <span class="radius-val" id="radiusVal">5 km</span>
+  </div>
 
-      <div class="karma-bar">
-        <h4>3. Safety/Escort Support</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-3" style="width: 30%;">30</div>
-        </div>
-        <input type="range" min="0" max="100" value="30" id="slider-3" oninput="updateKarmaBar(3)" />
-      </div>
+  <label>Preferences</label>
+  <div class="toggle-row">
+    <div>Available for cases<small>Master switch — same as the toggle on the feed</small></div>
+    <button class="sw" id="swAvail"></button>
+  </div>
+  <div class="toggle-row">
+    <div>Show me on the leaderboard<small>Turn off to volunteer anonymously</small></div>
+    <button class="sw on" id="swBoard"></button>
+  </div>
+  <div class="toggle-row">
+    <div>Only high/critical alerts<small>Skip low-severity notifications</small></div>
+    <button class="sw" id="swUrgentOnly"></button>
+  </div>
 
-      <div class="karma-bar">
-        <h4>4. Minor Technical Help</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-4" style="width: 20%;">20</div>
-        </div>
-        <input type="range" min="0" max="100" value="20" id="slider-4" oninput="updateKarmaBar(4)" />
-      </div>
+  <button class="save" id="saveBtn">Save profile</button>
+  <button class="logout" id="logoutBtn">Log out</button>
+</div>
 
-      <div class="karma-bar">
-        <h4>5. Lost or Stranded Help</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-5" style="width: 10%;">10</div>
-        </div>
-        <input type="range" min="0" max="100" value="10" id="slider-5" oninput="updateKarmaBar(5)" />
-      </div>
+<div class="toast" id="toast"></div>
 
-      <div class="karma-bar">
-        <h4>6. Support for Women or LGBTQ+ Users</h4>
-        <div class="bar">
-          <div class="bar-fill" id="bar-fill-6" style="width: 40%;">40</div>
-        </div>
-        <input type="range" min="0" max="100" value="40" id="slider-6" oninput="updateKarmaBar(6)" />
-      </div>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAfhLcpJ19GFJfZ2gQMUI2QsNkkIRE9QkA",
+  authDomain: "sahara-ai-4e3ee.firebaseapp.com",
+  projectId: "sahara-ai-4e3ee",
+  storageBucket: "sahara-ai-4e3ee.firebasestorage.app",
+  messagingSenderId: "605933418886",
+  appId: "1:605933418886:web:111541a8b9fcb3945dd407"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.firestore();
+const $ = id => document.getElementById(id);
+let me = null;
 
-      <!-- Buttons -->
-      <div class="button-container">
-        <button class="action-button" onclick="editProfile()">Edit Profile</button>
-        <button class="action-button" onclick="redeemPoints()">Redeem Points</button>
-        <button class="action-button" onclick="downloadLetter()">Download Letter</button>
-        <button class="action-button" onclick="viewThanks()">View Thanks</button>
-      </div>
-    </div>
-  </section>
+auth.onAuthStateChanged(async user => {
+  if (!user) { location.href = 'login.html'; return; }
+  me = user;
+  const s = await db.collection('users').doc(me.uid).get();
+  const d = s.data() || {};
+  const v = d.volunteer || {};
+  $('name').value = d.displayName || me.displayName || '';
+  $('phone').value = d.phone || '';
+  (v.skills || []).forEach(sk => { const b = document.querySelector(`[data-s="${CSS.escape(sk)}"]`); if (b) b.classList.add('on'); });
+  $('radius').value = v.radiusKm || 5; $('radiusVal').textContent = (v.radiusKm || 5) + ' km';
+  $('swAvail').classList.toggle('on', !!v.available);
+  $('swBoard').classList.toggle('on', v.onLeaderboard !== false);
+  $('swUrgentOnly').classList.toggle('on', !!v.urgentOnly);
+  $('stKarma').textContent = ((d.karma && d.karma.lifetime) || 0).toLocaleString();
+  $('stActive').textContent = v.available ? 'On' : 'Off';
+  // resolved-case count
+  const q = await db.collection('help_requests').where('assignedTo','==',me.uid).where('status','==','resolved').get();
+  $('stCases').textContent = q.size;
+});
 
-  <footer>
-    <p>© 2025 SAHARA Community | All rights reserved</p>
-  </footer>
+document.querySelectorAll('.skill').forEach(b => b.onclick = () => b.classList.toggle('on'));
+document.querySelectorAll('.sw').forEach(s => s.onclick = () => s.classList.toggle('on'));
+$('radius').oninput = () => $('radiusVal').textContent = $('radius').value + ' km';
 
-  <!-- Toastify JS -->
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-  <script>
-    function updateKarmaBar(id) {
-      const slider = document.getElementById(`slider-${id}`);
-      const barFill = document.getElementById(`bar-fill-${id}`);
-      const val = slider.value;
-      barFill.style.width = val + '%';
-      barFill.textContent = val;
-      updateTotalKarma();
+$('saveBtn').onclick = async () => {
+  const skills = [...document.querySelectorAll('.skill.on')].map(b => b.dataset.s);
+  await db.collection('users').doc(me.uid).set({
+    displayName: $('name').value.trim(),
+    phone: $('phone').value.trim(),
+    volunteer: {
+      active: true,
+      skills,
+      radiusKm: +$('radius').value,
+      available: $('swAvail').classList.contains('on'),
+      onLeaderboard: $('swBoard').classList.contains('on'),
+      urgentOnly: $('swUrgentOnly').classList.contains('on')
     }
+  }, { merge: true });
+  toast('Profile saved ★');
+};
 
-    function updateTotalKarma() {
-      let total = 0;
-      for(let i=1; i<=6; i++) {
-        const slider = document.getElementById(`slider-${i}`);
-        total += parseInt(slider.value);
-      }
-      document.getElementById('total-karma').textContent = `Total Karma Points: ${total}`;
-    }
+$('logoutBtn').onclick = async () => { await auth.signOut(); location.href = 'login.html'; };
 
-    function showToast(message) {
-      Toastify({
-        text: message,
-        duration: 3000,
-        close: true,
-        gravity: "top",
-        position: "right",
-        backgroundColor: "#007acc",
-        stopOnFocus: true,
-      }).showToast();
-    }
-
-    function editProfile() {
-      window.location.href = "edit-profile.html";
-    }
-
-    function redeemPoints() {
-      showToast("Redirecting to reward redemption page...");
-  
-    }
-
-    function downloadLetter() {
-      showToast("Generating recommendation letter...");
-      setTimeout(() => {
-        window.location.href = "pdf.html";
-      }, 1000);
-    }
-
-    function viewThanks() {
-      showToast("Opening your appreciation wall...");
-      
-    }
-
-    updateTotalKarma();
-  </script>
-
+let tT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),2600); }
+</script>
 </body>
 </html>
