@@ -144,6 +144,27 @@ backend URL for production.
   already in the stack).
 - **CORS**: restrict `allow_origins` in `main.py` to the deployed frontend
   origin before going live.
+## 🚀 Deployment
+
+### 🌐 Live Demo
+- **Frontend (Firebase Hosting):** https://sahara-ai-4e3ee.web.app
+- **Backend (Render):** https://YOUR-BACKEND.onrender.com
+
+### Tech Stack
+- **Frontend:** HTML, CSS, JavaScript (Firebase Hosting)
+- **Backend:** FastAPI (Python) deployed on Render
+- **Vector Database:** ChromaDB
+- **LLM:** Anthropic Claude
+- **Maps:** Google Maps API
+
+### Production Notes
+- Frontend is hosted on Firebase Hosting.
+- Backend is deployed on Render.
+- All frontend API requests point to the deployed Render backend.
+- CORS is configured to allow requests from:
+  ```
+  https://sahara-ai-4e3ee.web.app
+  ```
 
 ## Security & responsibility considerations
 
