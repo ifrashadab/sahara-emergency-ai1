@@ -10,7 +10,7 @@
   /* Geist Pixel with pixel-face fallback */
   @font-face{
     font-family:'Geist Pixel';
-    src:url('GeistPixel-Regular.woff2') format('woff2');
+    src:url('https://cdn.jsdelivr.net/npm/geist@latest/dist/fonts/geist-pixel/GeistPixel-Regular.woff2') format('woff2');
     font-display:swap;
   }
   :root{
@@ -169,6 +169,18 @@
   </div>
 
   <div class="auth-card rv right" id="authCard">
+    <div style="display:flex;gap:10px;margin-bottom:20px" id="roleRow">
+      <button type="button" class="role-card on" data-role="seeker" style="flex:1;padding:14px 10px;border-radius:14px;border:2px solid var(--violet);background:rgba(139,92,246,.14);text-align:center;transition:all .15s">
+        <span style="font-size:1.3rem;display:block;margin-bottom:6px">🙋‍♀️</span>
+        <b style="font-size:.8rem">I need help</b>
+        <small style="display:block;color:var(--text-soft);font-size:.66rem;margin-top:2px">Get AI guidance &amp; volunteers</small>
+      </button>
+      <button type="button" class="role-card" data-role="volunteer" style="flex:1;padding:14px 10px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);text-align:center;transition:all .15s">
+        <span style="font-size:1.3rem;display:block;margin-bottom:6px">🛡️</span>
+        <b style="font-size:.8rem">I'm a volunteer</b>
+        <small style="display:block;color:var(--text-soft);font-size:.66rem;margin-top:2px">Help people, earn karma</small>
+      </button>
+    </div>
     <div class="seg" role="tablist">
       <button class="on" id="tabIn" role="tab" aria-selected="true">Sign in</button>
       <button id="tabUp" role="tab" aria-selected="false">Register</button>
@@ -270,6 +282,7 @@
 <!-- Firebase (same project as existing pages) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <script>
 /* =============== Firebase auth =============== */
 const firebaseConfig = {
@@ -280,11 +293,35 @@ const firebaseConfig = {
   messagingSenderId: "605933418886",
   appId: "1:605933418886:web:111541a8b9fcb3945dd407"
 };
-let auth = null;
-try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); } catch(e){ console.warn('Firebase init failed', e); }
+let auth = null, db = null;
+try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.firestore(); } catch(e){ console.warn('Firebase init failed', e); }
 
 const $ = id => document.getElementById(id);
 let mode = 'signin';
+let role = 'seeker';
+
+/* Role selector */
+document.querySelectorAll('.role-card').forEach(c => c.onclick = () => {
+  role = c.dataset.role;
+  document.querySelectorAll('.role-card').forEach(x => {
+    const on = x === c;
+    x.classList.toggle('on', on);
+    x.style.borderColor = on ? 'var(--violet)' : 'var(--line)';
+    x.style.background = on ? 'rgba(139,92,246,.14)' : 'var(--surface-2)';
+  });
+});
+
+async function saveRoleAndGo(user) {
+  try {
+    await db.collection('users').doc(user.uid).set({
+      displayName: user.displayName || ($('name') && $('name').value.trim()) || user.email,
+      email: user.email,
+      ['roles.' + role]: true,
+      ...(role === 'volunteer' ? { volunteer: { active: true } } : {})
+    }, { merge: true });
+  } catch (e) { console.warn('role save failed', e); }
+  location.href = role === 'volunteer' ? 'volunteer.html' : 'assistant.html';
+}
 
 function switchMode(m){
   mode = m;
@@ -330,11 +367,11 @@ $('submitBtn').onclick = async () => {
       const cred = await auth.createUserWithEmailAndPassword(email, pass);
       if ($('name').value.trim()) await cred.user.updateProfile({ displayName: $('name').value.trim() });
       celebrate(); toast('＋50 PTS · Welcome to SAHARA!');
-      setTimeout(()=>location.href='assistant.html', 1600);
+      setTimeout(()=>saveRoleAndGo(cred.user), 1600);
     } else {
-      await auth.signInWithEmailAndPassword(email, pass);
+      const cred2 = await auth.signInWithEmailAndPassword(email, pass);
       toast('Welcome back!');
-      setTimeout(()=>location.href='assistant.html', 900);
+      setTimeout(()=>saveRoleAndGo(cred2.user), 900);
     }
   } catch (e) {
     // generic error copy — never reveal which part was wrong
@@ -346,7 +383,7 @@ $('submitBtn').onclick = async () => {
 };
 $('googleBtn').onclick = async () => {
   if (!auth) return toast('Auth service unavailable.');
-  try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); location.href='assistant.html'; }
+  try { const g = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); saveRoleAndGo(g.user); }
   catch(e){ toast('Google sign-in was cancelled.'); }
 };
 $('forgot').onclick = async (e) => {

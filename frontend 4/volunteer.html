@@ -6,7 +6,7 @@
 <title>SAHARA — Volunteer</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  @font-face{font-family:'Geist Pixel';src:url('https://cdn.jsdelivr.net/npm/geist@latest/dist/fonts/geist-pixel/GeistPixel-Regular.woff2') format('woff2');font-display:swap}
   :root{
     --plum:#1A0E1E;--surface:#26142E;--surface-2:#331B3D;--line:#43254F;
     --violet:#8B5CF6;--pink:#F472B6;--red:#EF4444;
@@ -98,7 +98,7 @@
     <div class="meta" id="activeMeta"></div>
     <div class="row">
       <a class="btn grad" id="activeDirections" target="_blank" rel="noopener">Directions →</a>
-      <button class="btn ghost" id="resolveBtn">✓ Mark resolved</button>
+      <button class="btn ghost" id="resolveBtn">✓ I’ve helped</button>
       <button class="btn danger" id="abandonBtn">Release case</button>
     </div>
   </div>
@@ -140,7 +140,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(), db = firebase.firestore();
 const $ = id => document.getElementById(id);
-const KARMA_API = 'http://localhost:8000/karma/award'; // deployed URL later
+
 
 let me = null, myDoc = null, requests = [], filter = 'all', unsubFeed = null;
 
@@ -217,74 +217,93 @@ function render() {
       <div class="desc">${esc(r.description || '')}</div>
       <div class="loc">📍 ${esc(r.location || 'Location not shared')}</div>
       <div class="row" style="align-items:center">
-        <span class="who">From ${esc(r.name || 'Anonymous')}</span>
+        <span class="who">From ${esc(r.name || 'Anonymous')} · ${Object.keys(r.offers||{}).length} offer(s)</span>
         <span style="flex:1"></span>
-        <button class="btn grad" data-accept="${r.id}">Accept case</button>
+        <button class="btn grad" data-accept="${r.id}" ${((r.offers||{})[me.uid]) ? 'disabled' : ''}>
+          ${((r.offers||{})[me.uid]) ? 'Offer sent ✓' : 'Offer to help'}
+        </button>
       </div>`;
     list.appendChild(el);
   });
   list.querySelectorAll('[data-accept]').forEach(b => b.onclick = () => acceptCase(b.dataset.accept, b));
 }
 
-/* ---------- Transactional accept (no double-assignment) ---------- */
+/* ---------- Offer to help (requester chooses among offers) ---------- */
 async function acceptCase(id, btn) {
   if (!myDoc || !(myDoc.volunteer && myDoc.volunteer.available)) {
-    toast('Switch to Available (top bar) before accepting.'); return;
+    toast('Switch to Available (top bar) before offering.'); return;
   }
-  btn.disabled = true; btn.textContent = 'Accepting…';
-  const ref = db.collection('help_requests').doc(id);
+  btn.disabled = true; btn.textContent = 'Sending offer…';
   try {
-    await db.runTransaction(async t => {
-      const s = await t.get(ref);
-      if (!s.exists) throw new Error('gone');
-      const d = s.data();
-      if (d.status !== 'open' || d.assignedTo) throw new Error('taken');
-      t.update(ref, {
-        status: 'assigned',
-        assignedTo: me.uid,
-        assignedToName: myDoc.displayName || me.email,
-        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+    const avg = myDoc.ratingCount ? (myDoc.ratingSum / myDoc.ratingCount) : null;
+    await db.collection('help_requests').doc(id).update({
+      ['offers.' + me.uid]: {
+        name: myDoc.displayName || me.email,
+        ratingAvg: avg,
+        resolvedCount: myDoc.resolvedCount || 0,
+        offeredAt: firebase.firestore.FieldValue.serverTimestamp()
+      }
     });
-    awardKarma('accept', id); // +100, server-side, fire-and-forget
-    toast('Case accepted — the requester can now see you are coming.');
+    toast('Offer sent — the requester will choose a volunteer.');
+    btn.textContent = 'Offer sent ✓';
   } catch (e) {
-    toast(e.message === 'taken' ? 'Another volunteer already took this case.' : 'Could not accept — try again.');
+    console.error(e);
+    toast('Could not send offer — try again.');
+    btn.disabled = false; btn.textContent = 'Offer to help';
   }
 }
 
-/* ---------- My active case ---------- */
-let activeId = null;
+/* ---------- My active case (assigned or awaiting confirmation) ---------- */
+let activeId = null, activeStatus = null;
 function watchMyCase() {
   db.collection('help_requests')
     .where('assignedTo', '==', auth.currentUser.uid)
-    .where('status', '==', 'assigned')
+    .where('status', 'in', ['assigned', 'pending_confirmation'])
     .limit(1)
     .onSnapshot(qs => {
       const box = $('activeCase');
       if (qs.empty) { box.style.display = 'none'; activeId = null; return; }
       const d = qs.docs[0]; activeId = d.id;
-      const r = d.data();
+      const r = d.data(); activeStatus = r.status;
+      const pending = r.status === 'pending_confirmation';
       $('activeMeta').innerHTML =
         `<strong>${esc(r.name || 'Anonymous')}</strong> · ${esc(r.type || '')} · severity: ${esc(r.severity || 'untriaged')}<br>` +
-        `${esc(r.description || '')}<br>📍 ${esc(r.location || 'no location')}`;
+        `${esc(r.description || '')}<br>📍 ${esc(r.location || 'no location')}` +
+        (pending ? '<br><span style="color:var(--sev-med)">⏳ Waiting for the requester to confirm — karma is awarded on their confirmation (auto after 24h).</span>' : '');
+      $('resolveBtn').style.display = pending ? 'none' : '';
+      $('abandonBtn').style.display = pending ? 'none' : '';
       const dir = $('activeDirections');
       if (r.coords && r.coords.lat) {
         dir.style.display = '';
         dir.href = `https://www.google.com/maps/dir/?api=1&destination=${r.coords.lat},${r.coords.lon}`;
       } else dir.style.display = 'none';
       box.style.display = 'block';
+
+      // Auto-confirm path: if pending >24h, ask the backend to finalize
+      if (pending && r.confirmRequestedAt && r.confirmRequestedAt.toDate &&
+          Date.now() - r.confirmRequestedAt.toDate().getTime() > 24*3600*1000) {
+        autoConfirm(d.id);
+      }
     });
+}
+
+async function autoConfirm(caseId) {
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    await fetch(API_BASE + '/case/auto_confirm', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken, caseId })
+    });
+  } catch (e) { console.warn('auto-confirm failed', e); }
 }
 
 $('resolveBtn').onclick = async () => {
   if (!activeId) return;
   await db.collection('help_requests').doc(activeId).update({
-    status: 'resolved',
-    resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    status: 'pending_confirmation',
+    confirmRequestedAt: firebase.firestore.FieldValue.serverTimestamp()
   });
-  awardKarma('resolve', activeId); // +250 server-side
-  toast('Case resolved — thank you. Karma incoming ★');
+  toast('Marked as helped — the requester will confirm, then karma lands ★');
 };
 
 $('abandonBtn').onclick = async () => {
@@ -296,17 +315,7 @@ $('abandonBtn').onclick = async () => {
   toast('Case released back to the feed.');
 };
 
-/* ---------- Karma via backend (never client-written) ---------- */
-async function awardKarma(action, caseId) {
-  try {
-    const idToken = await auth.currentUser.getIdToken();
-    await fetch(KARMA_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken, action, caseId })
-    });
-  } catch (e) { console.warn('karma award failed (backend offline?)', e); }
-}
+const API_BASE = 'http://localhost:8000'; // deployed URL later
 
 /* ---------- Filters / utils ---------- */
 document.querySelectorAll('.f-chip').forEach(c => c.onclick = () => {

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAHARA — My Case</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--plum:#1A0E1E;--surface:#26142E;--surface-2:#331B3D;--line:#43254F;--violet:#8B5CF6;--pink:#F472B6;
+    --text:#F5EFF9;--text-soft:#B69FC4;--grad:linear-gradient(135deg,var(--violet),var(--pink));
+    --sev-low:#34D399;--sev-med:#FBBF24;--sev-high:#FB7185;--sev-crit:#EF4444}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--plum);color:var(--text);min-height:100dvh;
+    background-image:radial-gradient(600px 400px at 90% 0%,rgba(139,92,246,.2),transparent 70%);background-attachment:fixed;
+    display:flex;flex-direction:column;align-items:center;padding:0 18px 60px}
+  .px{font-family:'Press Start 2P',monospace;letter-spacing:.02em;line-height:1.5}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .top{width:100%;max-width:560px;display:flex;padding:20px 0}
+  .top a{color:var(--text-soft);text-decoration:none;font-size:.85rem;font-weight:600}
+  .card{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:30px;margin-bottom:16px}
+  h1{font-size:clamp(.85rem,2.6vw,1.05rem);margin-bottom:8px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--text-soft);font-size:.85rem;line-height:1.6}
+  .stage{display:flex;gap:6px;margin:18px 0}
+  .stage i{flex:1;height:6px;border-radius:6px;background:var(--surface-2);font-style:normal}
+  .stage i.on{background:var(--grad)}
+  .stage-label{font-size:.78rem;font-weight:700;color:var(--pink)}
+  .desc{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:.88rem;line-height:1.6;margin-top:14px}
+
+  .vol{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;margin-top:10px;background:var(--surface-2)}
+  .vol .av{width:44px;height:44px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-weight:800;color:#fff;flex-shrink:0}
+  .vol b{display:block;font-size:.9rem}
+  .vol small{color:var(--text-soft);font-size:.74rem}
+  .vol .stars{color:var(--sev-med);font-size:.78rem}
+  .vol button{margin-left:auto;padding:10px 20px;border-radius:999px;background:var(--grad);color:#fff;font-weight:700;font-size:.78rem;flex-shrink:0}
+
+  .contact{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.35);border-radius:14px;padding:16px;margin-top:14px;font-size:.9rem;line-height:1.8}
+  .contact a{color:var(--sev-low);font-weight:700;text-decoration:none}
+  .big-btn{width:100%;margin-top:18px;padding:16px;border-radius:14px;background:var(--grad);color:#fff;font-weight:700;font-size:.95rem}
+  .rate{display:flex;gap:8px;justify-content:center;margin:16px 0 4px;font-size:1.8rem}
+  .rate span{cursor:pointer;filter:grayscale(1);transition:filter .15s,transform .15s}
+  .rate span.on{filter:none;transform:scale(1.12)}
+  .empty{color:var(--text-soft);font-size:.85rem;padding:14px 0}
+  .done{text-align:center;padding:20px 0}
+  .done .px{font-size:.9rem;color:var(--sev-low);display:block;margin-bottom:10px}
+  .toast{position:fixed;top:22px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--surface);border:1px solid var(--line);padding:13px 26px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:80;transition:transform .35s}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="top"><a href="askhelp.html">← New request</a></div>
+
+<div class="card">
+  <h1 class="px">YOUR HELP REQUEST</h1>
+  <p class="sub">Keep this page open — it updates automatically. Bookmark this link to check back anytime.</p>
+  <div class="stage"><i id="st1"></i><i id="st2"></i><i id="st3"></i></div>
+  <div class="stage-label" id="stageLabel">Loading…</div>
+  <div class="desc" id="caseDesc"></div>
+</div>
+
+<div class="card" id="offersCard" style="display:none">
+  <h1 class="px">VOLUNTEERS OFFERING TO HELP</h1>
+  <p class="sub">Choose who you're comfortable with. Contact details are shared only after you choose.</p>
+  <div id="offersList"><div class="empty">Waiting for volunteers to offer… this updates live.</div></div>
+</div>
+
+<div class="card" id="contactCard" style="display:none">
+  <h1 class="px">HELP IS ON THE WAY</h1>
+  <div class="contact" id="contactBox"></div>
+  <button class="big-btn" id="confirmBtn">✓ I'm safe now — confirm &amp; rate</button>
+</div>
+
+<div class="card" id="rateCard" style="display:none">
+  <h1 class="px">RATE YOUR VOLUNTEER</h1>
+  <p class="sub">Your rating helps others choose trusted volunteers.</p>
+  <div class="rate" id="rate"><span data-r="1">★</span><span data-r="2">★</span><span data-r="3">★</span><span data-r="4">★</span><span data-r="5">★</span></div>
+  <button class="big-btn" id="sendRating">Confirm resolution</button>
+</div>
+
+<div class="card done" id="doneCard" style="display:none">
+  <span class="px">CASE RESOLVED ✓</span>
+  <p class="sub">Thank you for confirming. Stay safe — SAHARA is always here.</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000'; // deployed backend URL later
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const caseId = params.get('id'), key = params.get('k');
+let state = null, chosenRating = 0, pollTimer = null;
+
+if (!caseId || !key) {
+  $('stageLabel').textContent = 'Invalid case link.';
+} else {
+  refresh();
+  pollTimer = setInterval(refresh, 8000); // live-ish updates
+}
+
+async function refresh() {
+  try {
+    const r = await fetch(`${API}/case/${caseId}?key=${encodeURIComponent(key)}`);
+    if (!r.ok) throw new Error(r.status);
+    state = await r.json();
+    render();
+  } catch (e) {
+    $('stageLabel').textContent = 'Could not load case — is the backend running?';
+  }
+}
+
+function render() {
+  $('caseDesc').textContent = `${state.type || ''} · severity: ${state.severity || 'untriaged'}\n${state.description || ''}`;
+  const s = state.status;
+  $('st1').className = 'on'; // requested
+  $('st2').className = (s !== 'open') ? 'on' : '';
+  $('st3').className = (s === 'resolved') ? 'on' : '';
+
+  $('offersCard').style.display = s === 'open' ? 'block' : 'none';
+  $('contactCard').style.display = (s === 'assigned' || s === 'pending_confirmation') ? 'block' : 'none';
+  $('doneCard').style.display = s === 'resolved' ? 'block' : 'none';
+
+  if (s === 'open') {
+    $('stageLabel').textContent = 'Waiting for you to choose a volunteer';
+    const list = $('offersList');
+    if (!state.offers.length) {
+      list.innerHTML = '<div class="empty">Waiting for volunteers to offer… this updates live.</div>';
+    } else {
+      list.innerHTML = state.offers.map(o => `
+        <div class="vol">
+          <div class="av">${esc((o.name||'V')[0].toUpperCase())}</div>
+          <div>
+            <b>${esc(o.name || 'Volunteer')}</b>
+            <small>${o.resolvedCount || 0} cases resolved · <span class="stars">${stars(o.ratingAvg)}</span></small>
+          </div>
+          <button data-uid="${esc(o.uid)}">Choose</button>
+        </div>`).join('');
+      list.querySelectorAll('button').forEach(b => b.onclick = () => choose(b.dataset.uid, b));
+    }
+  } else if (s === 'assigned' || s === 'pending_confirmation') {
+    $('stageLabel').textContent = s === 'pending_confirmation'
+      ? 'Your volunteer says they have helped — please confirm'
+      : 'Volunteer assigned — help is on the way';
+    $('contactBox').innerHTML =
+      `🛡 <strong>${esc(state.assignedToName || 'Volunteer')}</strong><br>` +
+      (state.assignedPhone
+        ? `📞 <a href="tel:${esc(state.assignedPhone)}">${esc(state.assignedPhone)}</a> — call or message them directly`
+        : `They will reach out at your location.`);
+  } else if (s === 'resolved') {
+    $('stageLabel').textContent = 'Resolved';
+    clearInterval(pollTimer);
+  }
+}
+
+async function choose(uid, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${API}/case/choose`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caseId, key, volunteerUid: uid })
+    });
+    if (!r.ok) throw new Error();
+    toast('Volunteer chosen — contact unlocked.');
+    refresh();
+  } catch { toast('Could not choose — try again.'); btn.disabled = false; btn.textContent = 'Choose'; }
+}
+
+$('confirmBtn').onclick = () => { $('contactCard').style.display = 'none'; $('rateCard').style.display = 'block'; };
+
+document.querySelectorAll('#rate span').forEach(s => s.onclick = () => {
+  chosenRating = +s.dataset.r;
+  document.querySelectorAll('#rate span').forEach(x => x.classList.toggle('on', +x.dataset.r <= chosenRating));
+});
+
+$('sendRating').onclick = async () => {
+  try {
+    const r = await fetch(`${API}/case/confirm`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caseId, key, rating: chosenRating || null })
+    });
+    if (!r.ok) throw new Error();
+    $('rateCard').style.display = 'none';
+    toast('Thank you — case resolved ★');
+    refresh();
+  } catch { toast('Could not confirm — try again.'); }
+};
+
+function stars(avg){ if(!avg) return 'new volunteer'; const n=Math.round(avg); return '★'.repeat(n)+'☆'.repeat(5-n)+` (${avg.toFixed(1)})`; }
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let tT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>

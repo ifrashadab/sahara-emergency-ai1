@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  @font-face{font-family:'Geist Pixel';src:url('GeistPixel-Regular.woff2') format('woff2');font-display:swap}
+  @font-face{font-family:'Geist Pixel';src:url('https://cdn.jsdelivr.net/npm/geist@latest/dist/fonts/geist-pixel/GeistPixel-Regular.woff2') format('woff2');font-display:swap}
   :root{
     --plum:#1A0E1E; --surface:#26142E; --surface-2:#331B3D; --line:#43254F;
     --violet:#8B5CF6; --pink:#F472B6; --red:#EF4444;
@@ -266,7 +266,8 @@ $('helpForm').addEventListener('submit', async ev => {
   const btn = $('submitBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
-    await db.collection('help_requests').add({
+    const accessKey = [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('');
+    const docRef = await db.collection('help_requests').add({
       name: $('name').value.trim(),
       location: $('location').value.trim(),
       coords: currentCoords,
@@ -275,14 +276,13 @@ $('helpForm').addEventListener('submit', async ev => {
       severity: lastSeverity,          // null if AI guidance wasn't used
       aiEscalated: lastEscalate,
       assignedTo: null,
+      offers: {},
+      accessKey,
       status: 'open',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    $('helpForm').reset();
-    $('aiPanel').style.display = 'none';
-    $('mapContainer').style.display = 'none';
-    $('btnLocation').textContent = '📍 Share live location';
-    toast('✓ Request sent — nearby volunteers will be notified.');
+    toast('✓ Request sent — taking you to your case page…');
+    setTimeout(() => location.href = `mycase.html?id=${docRef.id}&k=${accessKey}`, 900);
   } catch (e) {
     console.error('Submit failed:', e);
     toast('Could not send request — try again.');

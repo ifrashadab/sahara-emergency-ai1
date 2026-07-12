@@ -38,8 +38,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from karma_api import router as karma_router
-app.include_router(karma_router)
+from case_api import router as case_router
+app.include_router(case_router)
 
 print("Connecting to vector store...")
 chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
