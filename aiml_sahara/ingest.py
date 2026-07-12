@@ -40,9 +40,7 @@ def build_vector_store():
     except Exception:
         pass
 
-    embed_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-        model_name=EMBED_MODEL_NAME
-    )
+    embed_fn = embedding_functions.DefaultEmbeddingFunction()
 
     collection = client.create_collection(
         name=COLLECTION_NAME,

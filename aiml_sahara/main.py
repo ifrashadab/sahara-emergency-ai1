@@ -43,9 +43,7 @@ app.include_router(case_router)
 
 print("Connecting to vector store...")
 chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
-embed_fn = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name=EMBED_MODEL_NAME
-)
+embed_fn = embedding_functions.DefaultEmbeddingFunction()
 collection = chroma_client.get_collection(
     name=COLLECTION_NAME, embedding_function=embed_fn
 )

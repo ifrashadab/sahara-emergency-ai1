@@ -3,7 +3,7 @@ uvicorn[standard]
 pydantic
 python-dotenv
 chromadb
-sentence-transformers
+onnxruntime
 numpy<2
 groq
 firebase-admin
