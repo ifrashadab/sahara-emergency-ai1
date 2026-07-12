@@ -144,12 +144,11 @@ backend URL for production.
   already in the stack).
 - **CORS**: restrict `allow_origins` in `main.py` to the deployed frontend
   origin before going live.
-## 🚀 Deployment
 
-### 🌐 Live Demo
+##  Live Demo
+
 - **Frontend (Firebase Hosting):** https://sahara-ai-4e3ee.web.app
 - **Backend (Render):** https://sahara-ai-f4zg.onrender.com/
-
 ## Security & responsibility considerations
 
 - The assistant explicitly disclaims that it is not a substitute for emergency
