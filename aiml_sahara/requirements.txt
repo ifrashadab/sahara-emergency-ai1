@@ -1,13 +1,9 @@
 fastapi
 uvicorn[standard]
+pydantic
+python-dotenv
 chromadb
 sentence-transformers
-anthropic
-python-dotenv
-pydantic
-
-# Kept only if you want to keep the original classifier as an optional
-# offline fallback when the LLM API is unreachable — not required for the
-# core RAG flow.
-# transformers
-# torch
+numpy<2
+groq
+firebase-admin
