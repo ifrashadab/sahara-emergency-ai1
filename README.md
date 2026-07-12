@@ -148,7 +148,7 @@ backend URL for production.
 
 ### 🌐 Live Demo
 - **Frontend (Firebase Hosting):** https://sahara-ai-4e3ee.web.app
-- **Backend (Render):** https://sahara-ai-f4zg.onrender.com/)
+- **Backend (Render):** https://sahara-ai-f4zg.onrender.com/
 
 ## Security & responsibility considerations
 
